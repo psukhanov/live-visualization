@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title> How You Did </title>
+
+        <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+        <script type="text/javascript" src="js/jq.js"></script>
+        <script type="text/javascript" src="js/sb-1.4.1.js"></script>
+        <script type="text/javascript" src="../dc.js/web/js/d3.js"></script>
+        <script type="text/javascript" src="../dc.js/web/js/crossfilter.js"></script>
+        <script type="text/javascript" src="../dc.js/web/js/dc.js"></script>
+        <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
+    </head>
+    <body>
+        <div>
+            userID:<input id="userID" />
+            start:<input id="start" />
+            end:<input id="end" />
+        </div>
+        <table style="width:100%">
+            <tr>
+                <td><span id="test1">The Greatest Booth Ever</span></td>
+                <td><span id="test2"> An OK Booth</span></td>
+            </tr>
+            <tr>
+                <td><span id="test3"> The Booth You Should Have Skipped</span></td>
+                <td><span id="test4"> My EGGO: Let It Go</span></td>
+            </tr>
+        </table>
+        <script type="text/javascript">
+            $(window).on("load", setup);
+            function setup (){
+                alert("I like to break hearts and eat poptarts");
+            }
+        </script>
+
+    </body>
+</html>
