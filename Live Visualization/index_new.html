@@ -45,10 +45,13 @@
 			width: 800,
 			height: 400,
 			renderer: 'line',
-			series: new Rickshaw.Series([{ name: 'eeg' },{name: 'alpha_session_score'}])
+			series: [{
+				color: 'steelblue',
+				data: []
+				}]
 				});
 
-			/*var chart2 = new Rickshaw.Graph( {
+			var chart2 = new Rickshaw.Graph( {
 			element: document.querySelector("#test2"),
 			width: 800,
 			height: 400,
@@ -57,7 +60,7 @@
 				color: 'red',
 				data: []
 				}]
-				});*/
+				});
 
 
 			var xAxis = new Rickshaw.Graph.Axis.X({
@@ -73,8 +76,7 @@
 			yAxis.render();
 
 			var bufferLength = 120; 
-			var eegBuffer = [];
-			var alphaBuffer = [];
+			var buffer = [];
 
 			var userID, start, end;
 
@@ -91,8 +93,6 @@
 
 		        // create the spacebrew subscription channels
 				sb.addSubscribe("eeg", "string");		// create the subscription feed
-				sb.addSubscribe("alpha_session_score","string");
-
 
 				// configure the publication and subscription feeds
 				sb.onStringMessage = onStringMessage;		
@@ -144,14 +144,6 @@
 				//console.log("[onStringMessage] string message received ", value);
 				//$("#msg_received").text(value); // display the sent message in the browser  
 				//var data = JSON.parse(name);
-				if (name == 'eeg')
-				{
-
-				}
-				else if (name == 'alpha_session_score')
-				{
-					
-				}
 				if (buffer.length > bufferLength){
 					buffer.shift();
 				}
@@ -172,9 +164,6 @@
             		callback: "callback",
             		success: function (data) {
                 		//alert(data[0].timestamp);
-                		for(var i = 0; i < data.length; i++){
-
-                		}
 
                 		init_chart(data);
                 		//result = JSON.parse(json);
