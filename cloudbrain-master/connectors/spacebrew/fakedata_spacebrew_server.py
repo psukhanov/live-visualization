@@ -11,7 +11,7 @@ Spacebrew installation:
 __author__ = 'marion'
 
 # add the shared settings file to namespace
-import sys
+import sys, random
 from os.path import dirname, abspath
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 import settings
@@ -75,22 +75,25 @@ class SpacebrewServer(object):
             self.ws.send(json.dumps(config))
 
     def start(self):
+        time_stamp = 0
         while 1:
+            time_stamp+=1
+            time.sleep(0.05)
             for muse_id in self.muse_ids:
                 for path in self.osc_paths:
                     metric = path['address'].split('/')[-1]
                     nb_args = path['arguments']
-
-                    value = [path['address']] + [0]*nb_args
+                        
+                    value = [path['address']] + [time_stamp] + [random.random()]*nb_args
 
                     message = {"message": {
                         "value": value,
                         "type": "string", "name": metric, "clientName": muse_id}}
                     self.ws.send(json.dumps(message))
-                    time.sleep(0.1)
+                    
 
 
 
 if __name__ == "__main__":
-    server = SpacebrewServer(muse_ids=['muse-001', 'muse-002'], server=settings.CLOUDBRAIN_ADDRESS)
+    server = SpacebrewServer(muse_ids=['muse-001', 'muse-002'], server='127.0.0.1')
     server.start()
