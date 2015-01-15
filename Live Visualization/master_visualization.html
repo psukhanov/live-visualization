@@ -37,7 +37,7 @@
 
 			// Spacebrew Object
 			var sb
-				, app_name = "Live Vizualization"
+				, app_name = "booth-5"
 				;
 			var histData;
 			var chart = new Rickshaw.Graph( {
@@ -86,7 +86,7 @@
 			function setup (){
 
 				// setup spacebrew
-				sb = new Spacebrew.Client();  // create spacebrew client object
+				sb = new Spacebrew.Client('server.neuron.brain');  // create spacebrew client object
 
 				sb.name(app_name);
 				sb.description("This app sends text from an HTML form."); // set the app description
@@ -141,15 +141,17 @@
 			 * @param  {String} value 	Holds value received from the subscription feed
 			 */
 			function onStringMessage( name, value ){
-				//console.log("[onStringMessage] string message received ", value);
+				console.log("[onStringMessage] string message received ", value);
 				//$("#msg_received").text(value); // display the sent message in the browser  
-				//var data = JSON.parse(name);
+
+				var  values = value.split(',');
 				if (buffer.length > bufferLength){
 					buffer.shift();
 				}
-					buffer.push({"x":+value[1],"y":+value[2]});
-
-				update_chart(buffer);  
+					buffer.push({"x":+values[4],"y":+values[0]});
+					
+					
+				//update_chart(buffer);  
 				//yAxis.render();
 				//alert(value[1]);  
 			}
