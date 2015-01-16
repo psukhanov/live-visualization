@@ -29,7 +29,7 @@
 		  // variables to change 
 			var display_params = ["alpha_relative","HRV"]; //change 
 			var bufferLength = 120; 
-			var port_in = 9000;
+			var port_in = 9002;
 			var host = '127.0.0.1';
 
 			// display messages
@@ -39,13 +39,13 @@
 			var eeg_connected_text = "EEG: Connected";
 			var ecg_connected_text = "ECG: Connected";
 
-			var not_started_text = "Please swipe your RFID tag to begin";
-			var start_ecg_calibration_text = "This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin";
+			var not_started_text = "Please swipe your RFID tag to begin.";
+			var start_ecg_calibration_text = "This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin.";
 			var baseline_collection_text = "give us 30 seconds to calibrate to your brain and body. please stay still and silent.";
-			var query_text_1 = "how calm do you feel? type a number between 1 (not at all) and 9 (very) and hit enter";
+			var query_text_1 = "how calm do you feel? type a number between 1 (not at all) and 9 (very) and hit enter.";
 			var query_text_2 = "how content are you? (1-9)";
     		var query_text_3 = "how distracted are you? (1-9)";
-    		var query_text_0 = "did you complete the exercises correctly? type 1 for yes and 0 for no and hit enter";
+    		var query_text_0 = "did you complete the exercises correctly? type 1 for yes and 0 for no and hit enter.";
     		var prompt_text =  "Choose practice to investigate: \n1: Conscious breathing \n2: Vipassana Meditation \n3: Zen Meditation\n Type number and enter or just enter for random selection:";
     		var guided_practice_text_1 = "In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.";
     		var guided_practice_text_2 = "In this practice you will simply observe your breath for 90 seconds. Breathe normally and feel the breath on your upper lip. Get curious about this subtle sensation and feel it as completely as possible! If you get distracted, just return attention to your lip without worry. In this practice, we need to blindfold you. Please put on the eye mask (hanging on the hook) below your headphones. If you are not comfortable with this you may instead commit to keep your eyes shut the whole time until you are told to open them. Once your hand returns to the sensor we will start.";
@@ -69,7 +69,7 @@
 			// Spacebrew Object
 			
 			//set up graph & axes in Rickshaw
-			var chart = new Rickshaw.Graph( {
+			var graph = new Rickshaw.Graph( {
 			element: document.querySelector("#graph"),
 			width: 800,
 			height: 400,
@@ -81,14 +81,14 @@
 				});
 
 			var xAxis = new Rickshaw.Graph.Axis.X({
-    			graph: chart,
+    			graph: graph,
     			orientation: 'bottom',
 				element: document.getElementById('x_axis')
 				});
 			xAxis.render();
 
 			var yAxis = new Rickshaw.Graph.Axis.Y({
-    		graph: chart
+    		graph: graph
 				});
 			yAxis.render();
 
@@ -100,9 +100,10 @@
 
 				// setup spacebrew
 				sb = new Spacebrew.Client(host,app_name,app_description,{port:port_in});  // create spacebrew client object
-				sb.addSubscribe("instruction", "string");
 
-		        // create the spacebrew subscription channels
+						        // create the spacebrew subscription channels
+
+				sb.addSubscribe("instruction", "string");
 				sb.addSubscribe("alpha_relative", "string");		// create the subscription feed
 				
 				// configure the publication and subscription feeds
@@ -124,7 +125,9 @@
 
 			function onClose() {
 				var message = "Trying to connect";
-				$("#state").html( message );
+				$("#eeg_state").html( eeg_disconnected_text );
+				$("#ecg_state").html( ecg_disconnected_text );
+				$("#message").html( message );
 			}
 
 			/**
@@ -145,19 +148,30 @@
 						update_ui();
 					}
 				}
-				if (buffer.length > bufferLength){
-					buffer.shift();
-				}
+				else if (name == "alpha_relative")
+				{
+
+					/*var ecg_point = value['ecg'];
+					var eeg_point = value['alpha_absolute'];
+
+					graph.series[0].addData(ecg_point)
+					graph.series[1].addData(eeg_point)*/
+
+					if (buffer.length > bufferLength){
+						buffer.shift();
+					}
 					buffer.push({"x":+value[1],"y":+value[2]});
 
 				update_graph(buffer);  
+				}
+				
 			}
       
 
     		function update_graph(data)
     		{
-    			chart.series[0].data = data;
-    			chart.render(); 
+    			graph.series[0].data = data;
+    			graph.render(); 
     			//console.log(chart.series[0].data[0]);
     		}
 
@@ -171,12 +185,12 @@
     			if (program_state == "NOT_STARTED")
     			{
     				$("#message").html( not_started_text );
-    				$("#graph").hide();
+    				//$("#graph").hide();
     			}
     			else if (program_state == "START_ECG_CALIBRATION")
     			{
     				$("#message").html( start_ecg_calibration_text );
-    				$("#graph").hide();
+    				//$("#graph").hide();
     			}
     			else if (program_state == "BASELINE_COLLECTION")
     			{
@@ -184,7 +198,7 @@
     			}
     			else if (program_state == "CONDITION")
     			{
-    				$("#graph").show();
+    				//$("#graph").show();
     			}
 
     			if (eeg_state == "CONNECTED")
