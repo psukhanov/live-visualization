@@ -12,5 +12,20 @@ and websocket-client in python:
 ```
 sudo pip install websocket-client
 ```
+Currently running this with 2 local servers (one producing fake data and routing to python client, a 2nd for sending to the visualization after processing is done in that client, along with ECG data & instructions as needed). 
+To have the 2 instances of Spacebrew running, do 
+```
+node node_server_forever.js 
+```
+from the Spacebrew directory, and then
+```
+node node_server_forever.js -p 9002
+```
+to run the 2nd one on port 9002. 
+Once these are up, do 
+```
+python biodata_spacebrew_client.py
+```
+from the listeners directory in cloudbrew, and FINALLY, open up the biodata_visualization.html file in Live Visualization to start grabbing & plotting data! 
 
-Then, from the command line do "./run.sh" to launch a server sending randomized data, and then open "Live Visualization/index.html?server=localhost" (the last part should be in the URL you see) in your browser and it should start drawing a graph of the data routed through spacebrew. This is based on Marion's mock server and the rickshaw library on d3.js.
+(Will try to simplify process for further development). 
