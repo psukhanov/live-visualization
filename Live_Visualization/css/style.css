@@ -95,3 +95,12 @@ span {
   margin-bottom: 10px;
 }
 
+circle {
+  fill: none;
+  stroke: #398FBD;
+}
+
+#bloom {
+  height: 350px;
+  margin: 0px auto;
+}

@@ -13,6 +13,7 @@
 		<script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
 		<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
 		<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<!-- // <script type="text/javascript" src="js/bloom.js"></script> -->
 		<link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
 	</head>
 
@@ -26,6 +27,31 @@
 		        </div>
 			</header>
 			<div class="content">
+
+				<div class="row">
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									Breath
+									<small>breathing visualization</small>
+								</h4>
+							</header>
+							<div id="bloom"></div>
+						</section>
+					</div>
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									More Information
+									<small>Connection</small>
+								</h4>
+							</header>
+						</section>
+					</div>
+				</div>
+
 				<div class="row">
 		            <section class="widget">
 		                <header>
@@ -222,8 +248,9 @@
     			chart.render();
     			//console.log(chart.series[0].data[0]);
     		}
-
 	    </script>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script type="text/javascript" src="js/bloom.js"></script>
 	</body>
 
 </html>
