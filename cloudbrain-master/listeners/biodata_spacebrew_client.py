@@ -65,14 +65,14 @@ class SpacebrewClient(object):
             self.brew.add_subscriber(spacebrew_name, "string")
             self.brew.subscribe(spacebrew_name, self.handle_value)   
 
-        self.brew.add_publisher("alpha_relative","string")
+        self.brew.add_publisher("eeg_ecg","string")
         self.brew.add_publisher("instruction","string")
         self.brew.subscribe('alpha_relative',self.handle_value)
 
 
     def handle_value(self, string_value):
 
-        print "received string: %s" % string_value
+        #print "received string: %s" % string_value
         value = string_value.split(',')
         path = value[0]
         timestamp = value[5]
@@ -84,7 +84,7 @@ class SpacebrewClient(object):
             value_out = [path] + [timestamp] + [(float(value[2])+float(value[3]))/2]
             message = {"message": { #send synced EEG & ECG data here
                 "value": value_out,
-                "type": "string", "name": "alpha_relative", "clientName": self.client_name}}
+                "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
             instruction = {"message": {
                 "value" : "BASELINE_INSTRUCTIONS",
                 "type": "string", "name": "instruction", "clientName": self.client_name}}
@@ -109,17 +109,32 @@ class SpacebrewServer(object):
 
         self.ws = create_connection("ws://%s:%s" % (self.server, self.port))
 
-        for muse in muse_ids:
-            config = {
-                'config': {
-                    'name': muse,
-                    'publish': {
-                        'messages': [{'name': name['address'].split('/')[-1], 'type': 'string'} for name in self.osc_paths]
+        if(port==9000): #if this is the main server instance
+
+            for muse in muse_ids:
+                config = {
+                    'config': {
+                        'name': muse,
+                        'publish': {
+                            'messages': [{'name': name['address'].split('/')[-1], 'type': 'string'} for name in self.osc_paths]
+                        }
                     }
                 }
-            }
+            self.ws.send(json.dumps(config))    
+        
+        elif (port==9002):
+            config = {
+                    'config': {
+                        'name': 'booth-5',
+                        'publish': {
+                            'messages': [{'name': 'eeg_ecg', 'type' : 'string'},{'name' : 'instruction', 'type' : 'string'}]
+                     }
+                    }   
+                }
+            self.ws.send(json.dumps(config))    
+        
 
-        self.ws.send(json.dumps(config))
+        
 
     def start(self):
         time_stamp = 0
