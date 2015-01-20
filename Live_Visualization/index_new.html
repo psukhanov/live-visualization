@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Live Visualization</title>
+
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="js/jq.js"></script>
+		<script type="text/javascript" src="js/sb-1.4.1.js"></script>
+		<script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
+		<script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
+		<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
+	</head>
+
+	<body class="background landing">
+		<div class="container">
+			<header class="page-header">
+		        <div class="navbar">
+		            <div class="logo pull-left">
+		                <h2><a href="index.html">Change Your Mind</strong></a> <small>0.1</small></h2>
+		            </div>
+		        </div>
+			</header>
+			<div class="content">
+
+				<div class="row">
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									Breath
+									<small>breathing visualization</small>
+								</h4>
+							</header>
+							<div id="bloom"></div>
+						</section>
+					</div>
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									More Information
+									<small>Connection</small>
+								</h4>
+							</header>
+						</section>
+					</div>
+				</div>
+
+				<div class="row">
+		            <section class="widget">
+		                <header>
+		                    <h4>Electroencephalography (EEG) Readings
+		                        <small>Historical Plot</small>
+		                    </h4>
+		                    <div class="widget-controls">
+		                        <a title="Options" href="#"><i class="glyphicon glyphicon-cog"></i></a>
+		                        <a data-widgster="expand" title="Expand" href="#" style="display: none;"><i class="glyphicon glyphicon-plus"></i></a>
+		                        <a data-widgster="collapse" title="Collapse" href="#"><i class="glyphicon glyphicon-minus"></i></a>
+		                        <a data-widgster="close" title="Close" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+		                    </div>
+		                </header>
+		                <div class="histogram">
+							<div id="test"></div>
+							<div id="legend"></div>
+							</br></br>
+							<div id="name">Trying to connect</div>
+		                </div>
+		            </section>
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+
+			// when window loads call the setup method
+			$(window).on("load", setup);
+
+			// Spacebrew Object
+			var sb
+				, app_name = "Live Vizualization"
+				;
+			var histData;
+			var chart = new Rickshaw.Graph( {
+			element: document.querySelector("#test"),
+			width: 900,
+			height: 400,
+			renderer: 'line',
+			series: [{
+				name: 'Actual Data',
+				// color: '#30c020',
+				color: 'steelblue',
+				data: [],
+				// timeBase: new Date().getTime() / 1000
+				}]
+				});
+
+
+			var xAxis = new Rickshaw.Graph.Axis.X({
+    			graph: chart,
+    			orientation: 'bottom',
+				});
+			xAxis.render();
+
+			var yAxis = new Rickshaw.Graph.Axis.Y({
+    			graph: chart,
+    			tickFormat: Rickshaw.Fixtures.Number.formatKMBT
+				});
+			yAxis.render();
+
+			var legend = new Rickshaw.Graph.Legend({
+				element: document.querySelector('#legend'),
+				graph: chart
+			});
+
+			var bufferLength = 120;
+			var buffer = [];
+
+			var userID, start, end;
+
+			/**
+			* setup Function that connect to spacebrew and creates a listener for clicks of the submit button.
+			*/
+			function setup (){
+
+				// setup spacebrew
+				sb = new Spacebrew.Client();  // create spacebrew client object
+
+				sb.name(app_name);
+				sb.description("This app sends text from an HTML form."); // set the app description
+
+		        // create the spacebrew subscription channels
+				sb.addSubscribe("eeg", "string");		// create the subscription feed
+
+				// configure the publication and subscription feeds
+				sb.onStringMessage = onStringMessage;
+				sb.onOpen = onOpen;
+
+				// connect to spacbrew
+				sb.connect();
+				$("#button").on("mousedown", onMouseDown);
+
+			}
+
+			/**
+			 * Function that is called when Spacebrew connection is established
+			 */
+			function onOpen() {
+				var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+				$("#name").html( message );
+			}
+
+			/**
+			* onMouseDown Function that is called when the submit button is pressed. It reads the
+			*     text in the input box, and then sends it to spacebrew. It accepts a mouse event
+			*     object, though we don't use it in this example.
+			*/
+			function onMouseDown (evt){
+
+				//get inputs values to perform request
+
+			/*var useridvalue=encodeURIComponent(document.getElementById("userID").value);
+			var startvalue=encodeURIComponent(document.getElementById("start").value);
+			var endvalue=encodeURIComponent(document.getElementById("end").value);*/
+
+			userID="1";
+			start="1418446050";
+			end="1418446950";
+			url = "http://cloudbrain.rocks/data?userId="+userID+"&metric=concentration&start="+start+"&end="+end;
+			response = historyCall(url);
+
+			}
+
+
+			/**
+			 * onStringMessage Function that is called whenever new spacebrew string messages are received.
+			 *          It accepts two parameters:
+			 * @param  {String} name    Holds name of the subscription feed channel
+			 * @param  {String} value 	Holds value received from the subscription feed
+			 */
+			function onStringMessage( name, value ){
+				// console.log("[onStringMessage] string message received ", value);
+				//$("#msg_received").text(value); // display the sent message in the browser
+				//var data = JSON.parse(name);
+				if (buffer.length > bufferLength){
+					buffer.shift();
+				}
+					buffer.push({"x":+value[1],"y":+value[2]});
+
+				update_chart(buffer);
+				//yAxis.render();
+				//alert(value[1]);
+			}
+
+
+
+			function historyCall(url) {
+       		 	$.ajax({
+            		type: "GET",
+            		url: url,
+            		dataType: "jsonp",
+            		callback: "callback",
+            		success: function (data) {
+                		//alert(data[0].timestamp);
+
+                		init_chart(data);
+                		//result = JSON.parse(json);
+           			 },
+        		});
+    		}
+
+    		function init_chart(data)
+    		{
+					chart2.series[0].data = data;
+    				chart2.render();
+    		}
+
+    		function update_chart(data)
+    		{
+    			chart.series[0].data = data;
+    			chart.render();
+    			//console.log(chart.series[0].data[0]);
+    		}
+	    </script>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script type="text/javascript" src="js/bloom.js"></script>
+	</body>
+
+</html>

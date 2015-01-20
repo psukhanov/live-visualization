@@ -1,6 +1,6 @@
-body 
+body
 {
-			padding: 20px; font: 14px/145% "Helvetica Neue", Helvetica, Arial, Sans-serif;					
+			padding: 20px; font: 14px/145% "Helvetica Neue", Helvetica, Arial, Sans-serif;
 			background: #eeeeee;
 }
 a, a:link, a:visited { text-decoration: none; }
@@ -58,4 +58,49 @@ a, a:link, a:visited { text-decoration: none; }
 
 span {
 	line-height: 100%;
+}
+
+
+#histogram {
+  display: inline-block;
+  /*margin-left: 40px;*/
+  width: 960px;
+  height: 400px;
+  margin: 5px auto;
+}
+
+#axis0 {
+  position: absolute;
+  /*height: 800px;*/
+  top: 0;
+  bottom: 0;
+  width: 40px;
+}
+
+#legend {
+  display: inline-block;
+  position: relative;
+  left: 8px;
+  /*vertical-align: top;*/
+  /*margin: 0 0 0 10px;*/
+}
+
+#chart_container {
+  position: relative;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.widget h4 {
+  margin-bottom: 10px;
+}
+
+circle {
+  fill: none;
+  stroke: #398FBD;
+}
+
+#bloom {
+  height: 350px;
+  margin: 0px auto;
 }
