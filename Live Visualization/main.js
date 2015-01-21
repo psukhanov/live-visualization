@@ -1,57 +1,19 @@
-
 $(document).ready(function() {
-
-    // full page transitions
     $('#fullpage').fullpage({
-        //Navigation
-        menu: false,
-        anchors:['firstSlide', 'secondSlide'],
-        navigation: false,
-        navigationPosition: 'right',
-        navigationTooltips: ['firstSlide', 'secondSlide'],
-        slidesNavigation: true,
-        slidesNavPosition: 'bottom',
-
-        //Scrolling
+        // sectionsColor: ['#1bbc9b', '#4BBFC3', '#7BAABE', 'whitesmoke', '#ccddff'],
+        anchors: ['firstPage', 'secondPage', '3rdPage', '4thpage', 'lastPage'],
+        menu: '#menu',
         css3: true,
-        scrollingSpeed: 700,
-        autoScrolling: true,
-        scrollBar: false,
-        easing: 'easeInQuart',
-        easingcss3: 'ease',
-        loopBottom: false,
-        loopTop: false,
-        loopHorizontal: true,
-        continuousVertical: false,
-        normalScrollElements: '#element1, .element2',
-        scrollOverflow: false,
-        touchSensitivity: 15,
-        normalScrollElementTouchThreshold: 5,
+        scrollingSpeed: 1000
+    });
 
-        //Accessibility
-        keyboardScrolling: true,
-        animateAnchor: true,
-        recordHistory: true,
+    // $('#showExamples').click(function(e){
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     $('#examplesList').toggle();
+    // });
 
-        //Design
-        controlArrows: true,
-        verticalCentered: true,
-        resize : true,
-        sectionsColor : ['#ccc', '#fff'],
-        paddingTop: '3em',
-        paddingBottom: '10px',
-        fixedElements: '#header, .footer',
-        responsive: 0,
-
-        //Custom selectors
-        sectionSelector: '.section',
-        slideSelector: '.slide',
-
-        //events
-        onLeave: function(index, nextIndex, direction){},
-        afterLoad: function(anchorLink, index){},
-        afterRender: function(){},
-        afterResize: function(){},
-        afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex){},
-        onSlideLeave: function(anchorLink, index, slideIndex, direction){}
+    // $('html').click(function(){
+    //     $('#examplesList').hide();
+    // });
 });
