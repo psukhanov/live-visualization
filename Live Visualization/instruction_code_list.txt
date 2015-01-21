@@ -1,7 +1,7 @@
 List of Codes to pass from biodata_spacebrew_client.py to biodata_visualization.html 
 
-All codes are passed as JSON via the Spacebrew channel "Instruction". 
-All the json objects have a parameter "name", which is the name of the instruction. Possible values are:
+All codes are passed as JSON via the Spacebrew channel "instruction". 
+All the json objects have a key "instruction_name", which is the name of the instruction. Possible values are:
 
 DISPLAY_INSTRUCTION
 BASELINE_COLLECTION
@@ -10,11 +10,11 @@ POST_EXPERIMENT
 CONNECTED
 DISCONNECTED
 
-The other parameters differ by instruction. They are listed for each possible value, along with the meaning of the instruction. 
+The other keys differ by instruction. They are listed for each possible value, along with the meaning of the instruction. 
 
 DISPLAY_INSTRUCTION -> show a screen with a central label matching the content sent in the instruction (note: this includes all confirmation screens, querying the user screens, and NO_EXPERIMENT condition)
 additional parameters:
-	value: The string to be passed in. This will be html? 
+	instruction_text: The string to be passed in. This will be html? 
 
 BASELINE_COLLECTION -> Display live updating graph of EEG & ECG values, and a timer to countdown the trial. 
 additional parameters: 
