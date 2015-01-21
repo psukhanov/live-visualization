@@ -226,9 +226,9 @@
     		function update_ui(instruction)
     		{
 
-    			if (instruction.name == "DISPLAY_INSTRUCTION")
+    			if (instruction.instruction_name == "DISPLAY_INSTRUCTION")
     			{
-    				var message = instruction.value;
+    				var message = instruction.instruction_text;
     				// hide all divs except central label, insert value of string there
     				$("#graph").hide();
     				$("#bloom").hide();
@@ -236,7 +236,7 @@
 
     			}
 
-    			else if (instruction.name == "BASELINE_COLLECTION")
+    			else if (instruction.instruction_name == "BASELINE_COLLECTION")
     			{
     				$("#graph").show();
     				$("#bloom").hide();
@@ -246,7 +246,7 @@
     				start_baseline_timer(baseline_seconds)
 
     			}
-    			else if (instruction.name == "CONDITION_COLLECTION")
+    			else if (instruction.instruction_name == "CONDITION_COLLECTION")
     			{
     				console.log("condition began");
     				$("#graph").show();
@@ -255,13 +255,13 @@
     				var display_seconds = instruction.display_seconds; 
 
     			}
-    			else if (instruction.name == "POST_EXPERIMENT")
+    			else if (instruction.instruction_name == "POST_EXPERIMENT")
     			{
     				$("#graph").show();
     				$("#bloom").show();
     			}
 
-    			else if (instruction.name == "CONNECTED")
+    			else if (instruction.instruction_name == "CONNECTED")
     			{
     				if (instruction.type == "eeg"){
 						$("#eeg_state").html( eeg_connected_text );
@@ -271,7 +271,7 @@
 						$("#ecg_state").html( eeg_connected_text );
 					}
     			}
-    			else if (instruction.name == "DISCONNECTED")
+    			else if (instruction.instruction_name == "DISCONNECTED")
     			{
     				if (instruction.type == "eeg"){
 						$("#eeg_state").html( eeg_connected_text );
