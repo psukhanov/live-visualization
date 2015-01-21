@@ -24,8 +24,6 @@ from Queue import Queue
 
 
 
-FS = 512 # cardiochip reports ecg values at a sample rate of 512 hz
-HRV_UPDATE = 1 # update the HRV between this many hear beats; eg if 2, we update hrv every 2 beats
 
 SYNC_BYTE   = 0xAA #NOTE: this used to be 0x77!!! change this in the documentation
 EXCODE_BYTE = 0x55
@@ -60,13 +58,16 @@ class NeuroskyECG(object):
         self.port = port
         self.timeout= timeout
         self.baud = 57600
+        self.Fs = 512 # cardiochip reports ecg values at a sample rate of 512 hz
+        self.HRV_UPDATE = 1 # update the HRV between this many hear beats; eg if 2, we update hrv every 2 beats
+
 
         # CardioChip bluetooth auth key = 0000
         print "Connecting to NeuroSky CardioChip (%s)... " % self.port
         self.ser = serial.Serial(self.port, self.baud, timeout=self.timeout)
 
         self.ecg_buffer = Queue(0) # zero is infinite max queue length
-        self.analyze = self._ecgalgInitLib() #returns the C library object
+        self.analyze = self._ecgInitAlgLib() #returns the C library object
         self.filter_delay = 242 # number of samples of delay, 242 for 60Hz filter, 308 for 50 Hz
         self.starttime = None #start time, in unix epoch seconds
         self.curtime = None
@@ -93,6 +94,12 @@ class NeuroskyECG(object):
         """ stops running thread """
         self.connected = False  
 
+    def setHRVUpdate(self, numRRI):
+        """ 
+        set the number of RR intervals to count
+        between updating the HRV value
+        """
+        self.HRV_UPDATE = numRRI
 
     def _parseData(self, payload):
         """
@@ -152,7 +159,7 @@ class NeuroskyECG(object):
                     self.starttime = time.time()
                     self.curtime = self.starttime
                 else:
-                    self.curtime = self.curtime + 1./FS
+                    self.curtime = self.curtime + 1./self.Fs
 
                 out.append( {'timestamp': self.curtime, 'ecg_raw': raw } )
                 bytesParsed += length
@@ -178,8 +185,9 @@ class NeuroskyECG(object):
         read data packets from the cardiochip starter kit, via the bluetooth serial port
         """
         cur_leadstatus = 0
+        sample_count =0
         while self.connected:
-
+            sample_count+=1
             #check for sync bytes
             readbyte = ord(self.ser.read(1))
             #print readbyte, SYNC_BYTE
@@ -231,7 +239,8 @@ class NeuroskyECG(object):
             # store the output data in a queue
             # first, create a tuple with the sample index and dict with the timestamp and ecg
             ecgdict = next(((i,d) for i,d in enumerate(output) if 'ecg_raw' in d), None)
-            if ecgdict is not None:
+            if ecgdict is not None and sample_count>self.Fs*2:
+                #let's just ignore the first 2 seconds of crappy data
                 ecgdict[1]['leadoff'] = cur_leadstatus
                 #print ecgdict[1]
                 self.ecg_buffer.put(ecgdict[1]) # this should save the ecg and timestamp keys
@@ -248,7 +257,7 @@ class NeuroskyECG(object):
         return self.ecg_buffer.get()
 
 
-    def _ecgalgInitLib(self,libname='TgEcgAlg64.dll', power_frequency=60):
+    def _ecgInitAlgLib(self,libname='TgEcgAlg64.dll', power_frequency=60):
         """ initialize the TgEcg algorithm dll """
         print "loading analysis library: " + libname
         E = cdll.LoadLibrary(libname)
@@ -262,10 +271,16 @@ class NeuroskyECG(object):
         E.tg_ecg_init() # init the library with selected options
         return E
         
-    def ecgalgResetLib(self):
+    def ecgResetAlgLib(self):
         """ reset ecg algorithm """
         print "resetting ecg analysis library"
         self.analyze.tg_ecg_init()
+
+    def getTotalNumRRI(self):
+        """
+        return the total number of RRIs held in the algorithm buffer
+        """
+        return self.analyze.tg_ecg_get_total_rri_count()
 
 
     def ecgalgAnalyzeRaw(self, D): #, dataqueue):
@@ -290,7 +305,7 @@ class NeuroskyECG(object):
             D['rri']= rri
             D['hr'] = hr
             print "%i HR: %i (rri: %i)" % (num_rri, 60000* 1/rri, rri)
-            if num_rri >= 30 and (num_rri+2)%HRV_UPDATE == 0: 
+            if num_rri >= 30 and (num_rri+2) % self.HRV_UPDATE == 0: 
                 #calculate every 4 heartbeats, starting at 30
                 hrv = self.analyze.tg_ecg_compute_hrv(30)
                 D['hrv'] = hrv
@@ -330,8 +345,8 @@ if __name__ == "__main__":
     if plot_fig:
         plt.ion()
         #load the queues to plot
-        # t = [ x/FS for x in range(0,FS*1)]
-        # ecgval = [0]*FS*1
+        # t = [ x/nskECG.Fs for x in range(0,nskECG.Fs*1)]
+        # ecgval = [0]*nskECG.Fs*1
         t=[time.time()]
         ecgval =[0]
 
@@ -352,18 +367,20 @@ if __name__ == "__main__":
     sample_count = 0
     leadoff_count = 0
     while True:
-        sample_count+=1
         if not nskECG.isBufferEmpty():
+            sample_count+=1
+            #print "buffer len", nskECG.ecg_buffer.qsize()
             D = nskECG.popBuffer()
             # ignore data prior to leadoff
 
-            if D['leadoff']==0 and sample_count > FS*2:
+            if D['leadoff']==0 and sample_count > nskECG.Fs*2:
                 leadoff_count+=1
-                if leadoff_count>FS*2: #more than 2 seconds of leadoff, drop them
-                    if nskECG.analyze.tg_ecg_get_total_rri_count()!=0: # we haven't reset recently, DO IT
+                if leadoff_count>nskECG.Fs*2: #more than 2 seconds of leadoff, drop them
+                    if nskECG.getTotalNumRRI!=0: # we haven't reset recently, DO IT
                         ecgdict = [] #reset the buffer
-                        nskECG.ecgalgResetLib()
+                        nskECG.ecgResetAlgLib()
                         print "num rri post reset", nskECG.analyze.tg_ecg_get_total_rri_count()
+                    nskECG.ecg_buffer.task_done()
                     continue
             else: # leadoff==200, or lead on
                 leadoff_count=0
@@ -375,10 +392,10 @@ if __name__ == "__main__":
             #   You can do the same thing for 'rri' and 'hrv' values
             #   I would also keep track of the unix timestamp, to make sure it lines up
             #   with the EEG timestamps
-            #minibuffer = [nskECG.popBuffer() for i in range(0,FS/4.)]
+            #minibuffer = [nskECG.popBuffer() for i in range(0,nskECG.Fs/4.)]
             #ecgfilt = [x['ecg_filt'] for x in minibuffer]
             #if 'hrv' in D:
-            #    self.hrv=D['hrv']
+            #    cur_hrv=D['hrv']
 
             ecgdict.append(D)
             #print D
@@ -388,7 +405,7 @@ if __name__ == "__main__":
 
             if plot_fig and sample_count%64==0:
                 #print "length ecgdict", len(ecgdict),  -min([len(ecgdict),512*4])
-                ecgsub = ecgdict[-min([len(ecgdict),FS*4]):]
+                ecgsub = ecgdict[-min([len(ecgdict),nskECG.Fs*4]):]
 
                 ecg_t = [x['timestamp'] for x in ecgsub]
                 ecg_filt = [x['ecg_filt'] for x in ecgsub]
@@ -423,6 +440,8 @@ if __name__ == "__main__":
                 #    time.sleep(0.05)
                 plt.draw()
 
+            #let the queue know we are done processing its 
+            nskECG.ecg_buffer.task_done()
 
-    # stop the thread
+    # stop the thread, ctrl-C
     pass
