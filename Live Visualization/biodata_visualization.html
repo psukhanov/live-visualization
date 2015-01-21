@@ -168,9 +168,7 @@
 			 * Function that is called when Spacebrew connection is established
 			 */
 			function onOpen() {
-				eeg_state = "CONNECTED"
-				program_state = "START_ECG_CALIBRATION"
-				update_ui()
+				console.log("spacebrew client connection opened")
 			}
 
 			function onClose() {
