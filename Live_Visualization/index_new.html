@@ -5,8 +5,8 @@
 
 		<meta charset="utf-8">
 		<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
-		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
 		<link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
 		<script type="text/javascript" src="js/jq.js"></script>
 		<script type="text/javascript" src="js/sb-1.4.1.js"></script>
 		<script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
@@ -21,13 +21,24 @@
 			<header class="page-header">
 		        <div class="navbar">
 		            <div class="logo pull-left">
-		                <h2><a href="index.html">Change Your Mind</strong></a> <small>0.1</small></h2>
+		                <h2><a href="index.html">Change Your Mind</strong></a> <small>0.2</small></h2>
 		            </div>
 		        </div>
 			</header>
-			<div class="content">
+
+			<div class="content" id="fullpage">
 
 				<div class="row">
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									Baseline vs Actual
+								</h4>
+							</header>
+							<div id=""></div>
+						</section>
+					</div>
 					<div class="col-lg-6">
 						<section class="widget">
 							<header>
@@ -39,25 +50,30 @@
 							<div id="bloom"></div>
 						</section>
 					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									Baseline Collection
+								</h4>
+							</header>
+							<div id=""></div>
+						</section>
+					</div>
 					<div class="col-lg-6">
 						<section class="widget">
 							<header>
 								<h4>
 									More Information &nbsp;
-									<!-- <small>Messages</small> -->
 									<span class="label label-danger">Instructions</span>
 								</h4>
 							</header>
 							<div class="body">
-								<p>
-								This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin.
-								</p>
-								<!-- <ul class="text-list">
-									<li></li>
-									<li></li>
-									<li></li>
-									<li></li>
-								</ul> -->
+								<div id="msg-content"></div>
+								<div id="countdown"></div>
 							</div>
 						</section>
 					</div>
@@ -80,6 +96,40 @@
 		            </section>
 					</div>
 				</div>
+
+				<div class="row">
+					<div class="col-lg-12">
+			            <section class="widget">
+			                <header>
+			                    <h4>ECG Readings
+			                        <small>Real-time Plot</small>
+			                    </h4>
+			                </header>
+			                <div class="histogram">
+								<div id="test2"></div>
+								<div id="legend2"></div>
+								</br></br>
+								<div id="name">Trying to connect</div>
+			                </div>
+			            </section>
+					</div>
+				</div>
+
+			<div class="row">
+				<div class="col-lg-12">
+					<section class="widget">
+						<header>
+							<h4>
+								Results Page
+							</h4>
+						</header>
+						<div id="barchart1">
+							pass
+						</div>
+					</section>
+				</div>
+			</div>
+
 			</div>
 		</div>
 
@@ -236,6 +286,8 @@
 	    </script>
 		<script src="http://d3js.org/d3.v3.min.js"></script>
 		<script type="text/javascript" src="js/bloom.js"></script>
+		<script type="text/javascript" src="js/jquery.countdown360.js"></script>
+		<script type="text/javascript" src="js/countdown.js"></script>
 	</body>
 
 </html>

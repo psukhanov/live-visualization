@@ -1,7 +1,9 @@
 body
 {
-			padding: 20px; font: 14px/145% "Helvetica Neue", Helvetica, Arial, Sans-serif;
+			padding: 20px;
+      /*font: 14px/145% "Helvetica Neue", Helvetica, Arial, Sans-serif;*/
 			background: #eeeeee;
+      overflow-y: scroll;
 }
 a, a:link, a:visited { text-decoration: none; }
 
@@ -103,4 +105,9 @@ circle {
 #bloom {
   height: 350px;
   margin: 0px auto;
+}
+
+#countdown {
+  /*margin: 0px auto;*/
+  margin-left: 20%;
 }

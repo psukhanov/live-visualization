@@ -16,7 +16,7 @@
 		<link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
 	</head>
 
-		<body class="background landing">
+		<body class="background-dark">
 		<div class="container">
 			<header class="page-header">
 		        <div class="navbar">
@@ -76,9 +76,9 @@
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script type="text/javascript" src="js/bloom.js"></script>
 	<script type="text/javascript">
-		  
-		  // variables to change 
-			var bufferLength = 120; 
+
+		  // variables to change
+			var bufferLength = 120;
 			var port_in = 9002;
 			var host = '127.0.0.1';
 
@@ -103,7 +103,7 @@
 			$(window).on("load", setup);
 
 			// Spacebrew Object
-			
+
 			//set up graph & axes in Rickshaw
 			var graph = new Rickshaw.Graph( {
 			element: document.querySelector("#graph"),
@@ -142,23 +142,23 @@
 
 				sb.addSubscribe("instruction", "string");
 				sb.addSubscribe("eeg_ecg", "string");		// create the subscription feed
-				
+
 				// configure the publication and subscription feeds
-				sb.onStringMessage = onStringMessage;		
+				sb.onStringMessage = onStringMessage;
 				sb.onOpen = onOpen;
-				sb.onClose = onClose; 
+				sb.onClose = onClose;
 				// connect to spacbrew
-				sb.connect();  
+				sb.connect();
 
 
 				$(document).keypress(event,function(){
     				console.log(event);
     				console.log("key was presssed");
 
-    				var character = event.charCode; 
+    				var character = event.charCode;
     				if (character == "75")
     				{
-    					program_state = 
+    					program_state =
     				}
 
     			});
@@ -186,9 +186,9 @@
 			 */
 			function onStringMessage( name, value ){
 				//console.log("[onStringMessage] string message received ", value);
-				//$("#msg_received").text(value); // display the sent message in the browser 
+				//$("#msg_received").text(value); // display the sent message in the browser
 				if (name == 'instruction')
-				{					
+				{
 					update_ui(value);
 				}
 				else if (name == "eeg_ecg")
@@ -205,16 +205,16 @@
 					}
 					buffer.push({"x":+value[1],"y":+value[2]});
 
-				update_graph(buffer);  
+				update_graph(buffer);
 				}
-				
+
 			}
-      
+
 
     		function update_graph(data)
     		{
     			graph.series[0].data = data;
-    			graph.render(); 
+    			graph.render();
     			//console.log(chart.series[0].data[0]);
     		}
 
@@ -252,7 +252,7 @@
     				$("#graph").show();
     				$("#bloom").show();
 
-    				var display_seconds = instruction.display_seconds; 
+    				var display_seconds = instruction.display_seconds;
 
     			}
     			else if (instruction.instruction_name == "POST_EXPERIMENT")
@@ -289,5 +289,9 @@
     		}
 
 	    </script>
+
+        <script type="text/javascript" src="js/jquery.countdown360.js"></script>
+        <script type="text/javascript" src="js/countdown.js"></script>
+
 	</body>
 </html>
