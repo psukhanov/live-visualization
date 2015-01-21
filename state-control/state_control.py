@@ -104,7 +104,6 @@ class ChageYourBrainStateControl():
 		### collect subj info
 		### choose condition
     	###*** how to collect this keyboard input if window focus is not on console!??? 
-
     	start_condition_instructions()
 
 	def start_condition_instructions(self):
@@ -124,9 +123,16 @@ class ChageYourBrainStateControl():
     def start_post_condition(self):
     	"""ask for confirmation + subjective feedback"""
 		self.experiment_state = CONDITION_CONFIRMATION
-		### confirm
-		### collect subj info
 		### choose condition
+		### confirm
+	    output_instruction('CONFIRMATION')
+	    time.sleep(1)
+		### collect subj info
+	    output_instruction('Q1')
+	    time.sleep(1)
+	    output_instruction('Q2')
+	    time.sleep(1)
+	    output_instruction('Q3')
     	###*** how to collect this keyboard input if window focus is not on console!??? 
 
     def start_post_experiment(self):
@@ -136,12 +142,27 @@ class ChageYourBrainStateControl():
 	######################################################
 	### SEND TO VISUALIZTION #############################
 
-	def output_instruction(self):
-		if self.experiment_state == CONDITION_INSTRUCTIONS:
-			instruction = 
+	def output_instruction(self,sub_state=None):
 		if self.experiment_state == BASELINE_INSTRUCTIONS:
+			instruction_text = ###
+		if self.experiment_state == CONDITION_INSTRUCTIONS:
+			instruction_text = ###
+		if self.experiment_state in [CONDITION_CONFIRMATION,BASELINE_CONFIRMATION]:
+			if sub_state == "CONFIRMATION" and self.experiment_state == BASELINE_CONFIRMATION:
+				instruction_text = ###
+			elif sub_state == "CONFIRMATION" and self.experiment_state == CONDITION_CONFIRMATION:
+				instruction_text = ###
+			elif sub_state == "Q1":
+				instruction_text = ###
+			elif sub_state == "Q2":
+				instruction_text = ###
+			elif sub_state == "Q3":
+				instruction_text = ###
+			else:
+				raise Exception ('Unkown sub_state for instruction sent in state ' + str(self.experiment_state)
+
 		instruction = {"message": {
-            "value" : value,
+            "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
             "type": "string", "name": "instruction", "clientName": self.client_name}}    
         self.sb_server.ws.send(json.dumps(instruction))
 
