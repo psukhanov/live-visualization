@@ -44,7 +44,7 @@
 							<header>
 								<h4>
 									More Information
-									<small>Connection</small>
+									<small id="message">Connection</small>
 								</h4>
 							</header>
 						</section>
@@ -68,14 +68,14 @@
 							<div id="graph"></div>
 							<div id="legend"></div>
 							</br></br>
-							<div id="message">Trying to connect</div>
 		                </div>
 		            </section>
 				</div>
 			</div>
 		</div>
-
-<script type="text/javascript">
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript" src="js/bloom.js"></script>
+	<script type="text/javascript">
 		  
 		  // variables to change 
 			var display_params = ["alpha_relative","HRV"]; //change 
@@ -91,14 +91,16 @@
 			var ecg_connected_text = "ECG: Connected";
 
 			var not_started_text = "Please swipe your RFID tag to begin.";
-			var start_ecg_calibration_text = "This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin.";
+			var start_ecg_calibration_text = "This booth requires approximately a four minute commitment. To continue, put on headphones, and place hands on sensors to begin.";
 			var baseline_collection_text = "give us 30 seconds to calibrate to your brain and body. please stay still and silent.";
+
+			var baseline_confirmation_text = "Were you still and silent during the baseline collection?"
 			var query_text_1 = "how calm do you feel? type a number between 1 (not at all) and 9 (very) and hit enter.";
 			var query_text_2 = "how content are you? (1-9)";
     		var query_text_3 = "how distracted are you? (1-9)";
     		var query_text_0 = "did you complete the exercises correctly? type 1 for yes and 0 for no and hit enter.";
     		var prompt_text =  "Choose practice to investigate: \n1: Conscious breathing \n2: Vipassana Meditation \n3: Zen Meditation\n Type number and enter or just enter for random selection:";
-    		var guided_practice_text_1 = "In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.";
+    		var guided_practice_text_1 = "Please make sure your hands are resting on the sensors. In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out."; //text will display for ~10s, waiting for instruction from python
     		var guided_practice_text_2 = "In this practice you will simply observe your breath for 90 seconds. Breathe normally and feel the breath on your upper lip. Get curious about this subtle sensation and feel it as completely as possible! If you get distracted, just return attention to your lip without worry. In this practice, we need to blindfold you. Please put on the eye mask (hanging on the hook) below your headphones. If you are not comfortable with this you may instead commit to keep your eyes shut the whole time until you are told to open them. Once your hand returns to the sensor we will start.";
     		var guided_practice_text_3 = "";
 
@@ -147,6 +149,7 @@
 			* setup Function that connect to spacebrew and creates a listener for data being passed from biodata_spacebrew_client.py
 			*/
 
+
 			function setup (){
 
 				// setup spacebrew
@@ -163,6 +166,20 @@
 				sb.onClose = onClose; 
 				// connect to spacbrew
 				sb.connect();  
+
+
+				$(document).keypress(event,function(){
+    				console.log(event);
+    				console.log("key was presssed");
+
+    				var character = event.charCode; 
+    				if (character == "75")
+    				{
+    					
+    				}
+
+    			});
+
 			}
 			/**
 			 * Function that is called when Spacebrew connection is established
@@ -187,7 +204,7 @@
 			 * @param  {String} value 	Holds value received from the subscription feed
 			 */
 			function onStringMessage( name, value ){
-				console.log("[onStringMessage] string message received ", value);
+				//console.log("[onStringMessage] string message received ", value);
 				//$("#msg_received").text(value); // display the sent message in the browser 
 				if (name == 'instruction')
 				{					
@@ -235,20 +252,25 @@
     			if (program_state == "NOT_STARTED")
     			{
     				$("#message").html( not_started_text );
-    				//$("#graph").hide();
+    				$("#graph").hide();
+    				$("bloom").hide();
     			}
     			else if (program_state == "START_ECG_CALIBRATION")
     			{
+    				console.log("START_ECG_CALIBRATION was called");
     				$("#message").html( start_ecg_calibration_text );
-    				//$("#graph").hide();
+    				$("bloom").hide();
+    				$("#graph").hide();
     			}
     			else if (program_state == "BASELINE_COLLECTION")
     			{
     				$("#message").html( baseline_collection_text );
+    				$("#graph").show();
+
     			}
     			else if (program_state == "CONDITION")
     			{
-    				//$("#graph").show();
+    				$("#bloom").show();
     			}
 
     			if (eeg_state == "CONNECTED")
@@ -277,7 +299,5 @@
     		}
 
 	    </script>
-	   	<script src="http://d3js.org/d3.v3.min.js"></script>
-		<script type="text/javascript" src="js/bloom.js"></script>
 	</body>
 </html>

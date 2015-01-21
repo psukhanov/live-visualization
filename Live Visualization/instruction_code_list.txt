@@ -1,0 +1,45 @@
+List of Codes to pass from biodata_spacebrew_client.py to biodata_visualization.html 
+
+All codes are passed as JSON via the Spacebrew channel "Instruction". 
+All the json objects have a parameter "name", which is the name of the instruction. Possible values are:
+
+DISPLAY_INSTRUCTION
+BASELINE_COLLECTION
+CONDITION_COLLECTION
+POST_EXPERIMENT
+CONNECTED
+DISCONNECTED
+
+The other parameters differ by instruction. They are listed for each possible value, along with the meaning of the instruction. 
+
+DISPLAY_INSTRUCTION -> show a screen with a central label matching the content sent in the instruction (note: this includes all confirmation screens, querying the user screens, and NO_EXPERIMENT condition)
+additional parameters:
+	value: The string to be passed in. This will be html? 
+
+BASELINE_COLLECTION -> Display live updating graph of EEG & ECG values, and a timer to countdown the trial. 
+additional parameters: 
+	display_seconds: the amount of time the baseline collection will go on for. This is for displaying our timer. 
+
+CONDITION_COLLECTION -> Display live updating graph of EEG & ECG values, and a concentric pulse circle to synchronize breath to. 
+additional parameters: 
+	display_seconds: the amount of time the condition collection will go on for. This is for displaying our timer. 
+	condition: the name of the condition to display. Defaults to controlled breathing condition. 
+	baseline_alpha: the average value of alpha waves during baseline, to plot on graph
+	baseline_hrv: the average value of hrv during baseline, to plot on graph
+
+POST_EXPERIMENT -> show screen with bar charts & description of changes that happened to user
+additional parameters: 
+	baseline_alpha: the average value of alpha waves during baseline, to plot on graph
+	baseline_hrv: the average value of hrv during baseline, to plot on graph
+	baseline_calm: The value entered by user for their "calm" level, following baseline. 
+	condition_alpha: the average value of alpha waves during condition, to plot on graph
+	condition_hrv: the average value of hrv during condition, to plot on graph
+	condition_calm: The value entered by user for their "calm" level, following condition. 
+
+CONNECTED -> either the eeg or the ecg has started sending data. Update the eeg_connected or ecg_connected label. 
+additional_parameters: 
+	type: either "eeg" or "ecg"
+
+DISCONNECTED -> either the eeg or the ecg has stopped sending data. Update the eeg_connected or ecg_connected label. 
+additional_parameters: 
+	type: either "eeg" or "ecg"	
