@@ -2,7 +2,7 @@ var margin = {
     top: 40,
     right: 40,
     bottom: 40,
-    left: 40
+    left: 120
 },
     // width = 960 - margin.left - margin.right,
     width = 280,
