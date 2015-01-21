@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Live Visualization</title>
+
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="js/jq.js"></script>
+		<script type="text/javascript" src="js/sb-1.4.1.js"></script>
+		<script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
+		<script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
+		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
+	</head>
+
+		<body class="background landing">
+		<div class="container">
+			<header class="page-header">
+		        <div class="navbar">
+		            <div class="logo pull-left">
+		                <h2><a href="index.html">Change Your Mind</strong></a> <small>0.1</small></h2>
+		            </div>
+		        </div>
+			</header>
+			<div class="content">
+
+				<div class="row">
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									Breath
+									<small>breathing visualization</small>
+								</h4>
+							</header>
+							<div id="bloom"></div>
+						</section>
+					</div>
+					<div class="col-lg-6">
+						<section class="widget">
+							<header>
+								<h4>
+									More Information
+									<small>Connection</small>
+								</h4>
+							</header>
+						</section>
+					</div>
+				</div>
+
+				<div class="row">
+		            <section class="widget">
+		                <header>
+		                    <h4>Electroencephalography (EEG) Readings
+		                        <small>Historical Plot</small>
+		                    </h4>
+		                    <div class="widget-controls">
+		                        <a title="Options" href="#"><i class="glyphicon glyphicon-cog"></i></a>
+		                        <a data-widgster="expand" title="Expand" href="#" style="display: none;"><i class="glyphicon glyphicon-plus"></i></a>
+		                        <a data-widgster="collapse" title="Collapse" href="#"><i class="glyphicon glyphicon-minus"></i></a>
+		                        <a data-widgster="close" title="Close" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+		                    </div>
+		                </header>
+		                <div class="histogram">
+							<div id="graph"></div>
+							<div id="legend"></div>
+							</br></br>
+							<div id="message">Trying to connect</div>
+		                </div>
+		            </section>
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+		  
+		  // variables to change 
+			var display_params = ["alpha_relative","HRV"]; //change 
+			var bufferLength = 120; 
+			var port_in = 9002;
+			var host = '127.0.0.1';
+
+			// display messages
+			var eeg_disconnected_text = "EEG: Not Connected";
+			var ecg_disconnected_text = "ECG: Not Connected";
+
+			var eeg_connected_text = "EEG: Connected";
+			var ecg_connected_text = "ECG: Connected";
+
+			var not_started_text = "Please swipe your RFID tag to begin.";
+			var start_ecg_calibration_text = "This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin.";
+			var baseline_collection_text = "give us 30 seconds to calibrate to your brain and body. please stay still and silent.";
+			var query_text_1 = "how calm do you feel? type a number between 1 (not at all) and 9 (very) and hit enter.";
+			var query_text_2 = "how content are you? (1-9)";
+    		var query_text_3 = "how distracted are you? (1-9)";
+    		var query_text_0 = "did you complete the exercises correctly? type 1 for yes and 0 for no and hit enter.";
+    		var prompt_text =  "Choose practice to investigate: \n1: Conscious breathing \n2: Vipassana Meditation \n3: Zen Meditation\n Type number and enter or just enter for random selection:";
+    		var guided_practice_text_1 = "In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.";
+    		var guided_practice_text_2 = "In this practice you will simply observe your breath for 90 seconds. Breathe normally and feel the breath on your upper lip. Get curious about this subtle sensation and feel it as completely as possible! If you get distracted, just return attention to your lip without worry. In this practice, we need to blindfold you. Please put on the eye mask (hanging on the hook) below your headphones. If you are not comfortable with this you may instead commit to keep your eyes shut the whole time until you are told to open them. Once your hand returns to the sensor we will start.";
+    		var guided_practice_text_3 = "";
+
+    		var baseline_seconds = 30;
+    		var condition_seconds = 90;
+
+			// initialize program variables
+			var program_state = "NOT_STARTED";
+			var eeg_state = "DISCONNECTED";
+			var ecg_state = "DISCONNECTED";
+
+			var buffer = [];
+			var sb, app_name = "Change_your_mind"; //Biodata (ECG + EEG viz) is booth 5!
+			var app_description = "Charts realtime alpha_relative to baseline (EEG) and HRV relative to baseline (ECG) data";
+
+			// when window loads call the setup method
+			$(window).on("load", setup);
+
+			// Spacebrew Object
+			
+			//set up graph & axes in Rickshaw
+			var graph = new Rickshaw.Graph( {
+			element: document.querySelector("#graph"),
+			width: 800,
+			height: 400,
+			renderer: 'line',
+			series: [{
+				color: 'steelblue',
+				data: []
+				}]
+				});
+
+			var xAxis = new Rickshaw.Graph.Axis.X({
+    			graph: graph,
+    			orientation: 'bottom',
+				element: document.getElementById('x_axis')
+				});
+			xAxis.render();
+
+			var yAxis = new Rickshaw.Graph.Axis.Y({
+    		graph: graph
+				});
+			yAxis.render();
+
+			/**
+			* setup Function that connect to spacebrew and creates a listener for data being passed from biodata_spacebrew_client.py
+			*/
+
+			function setup (){
+
+				// setup spacebrew
+				sb = new Spacebrew.Client(host,app_name,app_description,{port:port_in});  // create spacebrew client object
+
+				// create the spacebrew subscription channels
+
+				sb.addSubscribe("instruction", "string");
+				sb.addSubscribe("eeg_ecg", "string");		// create the subscription feed
+				
+				// configure the publication and subscription feeds
+				sb.onStringMessage = onStringMessage;		
+				sb.onOpen = onOpen;
+				sb.onClose = onClose; 
+				// connect to spacbrew
+				sb.connect();  
+			}
+			/**
+			 * Function that is called when Spacebrew connection is established
+			 */
+			function onOpen() {
+				eeg_state = "CONNECTED"
+				program_state = "START_ECG_CALIBRATION"
+				update_ui()
+			}
+
+			function onClose() {
+				var message = "Trying to connect";
+				$("#eeg_state").html( eeg_disconnected_text );
+				$("#ecg_state").html( ecg_disconnected_text );
+				$("#message").html( message );
+			}
+
+			/**
+			 * onStringMessage Function that is called whenever new spacebrew string messages are received.
+			 *          It accepts two parameters:
+			 * @param  {String} name    Holds name of the subscription feed channel
+			 * @param  {String} value 	Holds value received from the subscription feed
+			 */
+			function onStringMessage( name, value ){
+				console.log("[onStringMessage] string message received ", value);
+				//$("#msg_received").text(value); // display the sent message in the browser 
+				if (name == 'instruction')
+				{					
+					if (value == "BASELINE_COLLECTION")
+					{
+						program_state = value;
+						start_baseline_timer(baseline_seconds);
+						update_ui();
+					}
+				}
+				else if (name == "eeg_ecg")
+				{
+
+					/*var ecg_point = value['ecg'];
+					var eeg_point = value['alpha_absolute'];
+
+					graph.series[0].addData(ecg_point)
+					graph.series[1].addData(eeg_point)*/
+
+					if (buffer.length > bufferLength){
+						buffer.shift();
+					}
+					buffer.push({"x":+value[1],"y":+value[2]});
+
+				update_graph(buffer);  
+				}
+				
+			}
+      
+
+    		function update_graph(data)
+    		{
+    			graph.series[0].data = data;
+    			graph.render(); 
+    			//console.log(chart.series[0].data[0]);
+    		}
+
+    		function clear_graph()
+    		{
+
+    		}
+
+    		function update_ui()
+    		{
+    			if (program_state == "NOT_STARTED")
+    			{
+    				$("#message").html( not_started_text );
+    				//$("#graph").hide();
+    			}
+    			else if (program_state == "START_ECG_CALIBRATION")
+    			{
+    				$("#message").html( start_ecg_calibration_text );
+    				//$("#graph").hide();
+    			}
+    			else if (program_state == "BASELINE_COLLECTION")
+    			{
+    				$("#message").html( baseline_collection_text );
+    			}
+    			else if (program_state == "CONDITION")
+    			{
+    				//$("#graph").show();
+    			}
+
+    			if (eeg_state == "CONNECTED")
+    			{
+					$("#eeg_state").html( eeg_connected_text );
+    			}
+    			else if (eeg_state == "DISCONNECTED")
+    			{
+    				$("#eeg_state").html( eeg_disconnected_text );
+    			}
+
+
+    			if (ecg_state == "CONNECTED")
+    			{
+    				$("#ecg_state").html( ecg_connected_text );
+    			}
+    			else if (ecg_state == "DISCONNECTED")
+    			{
+					$("#ecg_state").html( ecg_disconnected_text );
+    			}
+    		}
+
+    		function start_baseline_timer(seconds)
+    		{
+
+    		}
+
+	    </script>
+	   	<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script type="text/javascript" src="js/bloom.js"></script>
+	</body>
+</html>
