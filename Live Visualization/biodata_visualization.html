@@ -78,7 +78,6 @@
 	<script type="text/javascript">
 		  
 		  // variables to change 
-			var display_params = ["alpha_relative","HRV"]; //change 
 			var bufferLength = 120; 
 			var port_in = 9002;
 			var host = '127.0.0.1';
@@ -91,24 +90,8 @@
 			var ecg_connected_text = "ECG: Connected";
 
 			var not_started_text = "Please swipe your RFID tag to begin.";
-			var start_ecg_calibration_text = "This booth requires approximately a four minute commitment. To continue, put on headphones, and place hands on sensors to begin.";
-			var baseline_collection_text = "give us 30 seconds to calibrate to your brain and body. please stay still and silent.";
-
-			var baseline_confirmation_text = "Were you still and silent during the baseline collection?"
-			var query_text_1 = "how calm do you feel? type a number between 1 (not at all) and 9 (very) and hit enter.";
-			var query_text_2 = "how content are you? (1-9)";
-    		var query_text_3 = "how distracted are you? (1-9)";
-    		var query_text_0 = "did you complete the exercises correctly? type 1 for yes and 0 for no and hit enter.";
-    		var prompt_text =  "Choose practice to investigate: \n1: Conscious breathing \n2: Vipassana Meditation \n3: Zen Meditation\n Type number and enter or just enter for random selection:";
-    		var guided_practice_text_1 = "Please make sure your hands are resting on the sensors. In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out."; //text will display for ~10s, waiting for instruction from python
-    		var guided_practice_text_2 = "In this practice you will simply observe your breath for 90 seconds. Breathe normally and feel the breath on your upper lip. Get curious about this subtle sensation and feel it as completely as possible! If you get distracted, just return attention to your lip without worry. In this practice, we need to blindfold you. Please put on the eye mask (hanging on the hook) below your headphones. If you are not comfortable with this you may instead commit to keep your eyes shut the whole time until you are told to open them. Once your hand returns to the sensor we will start.";
-    		var guided_practice_text_3 = "";
-
-    		var baseline_seconds = 30;
-    		var condition_seconds = 90;
 
 			// initialize program variables
-			var program_state = "NOT_STARTED";
 			var eeg_state = "DISCONNECTED";
 			var ecg_state = "DISCONNECTED";
 
@@ -175,7 +158,7 @@
     				var character = event.charCode; 
     				if (character == "75")
     				{
-    					
+    					program_state = 
     				}
 
     			});
@@ -208,12 +191,7 @@
 				//$("#msg_received").text(value); // display the sent message in the browser 
 				if (name == 'instruction')
 				{					
-					if (value == "BASELINE_COLLECTION")
-					{
-						program_state = value;
-						start_baseline_timer(baseline_seconds);
-						update_ui();
-					}
+					update_ui(value);
 				}
 				else if (name == "eeg_ecg")
 				{
@@ -247,49 +225,63 @@
 
     		}
 
-    		function update_ui()
+    		function update_ui(instruction)
     		{
-    			if (program_state == "NOT_STARTED")
+
+    			if (instruction.name == "DISPLAY_INSTRUCTION")
     			{
-    				$("#message").html( not_started_text );
+    				var message = instruction.value;
+    				// hide all divs except central label, insert value of string there
     				$("#graph").hide();
-    				$("bloom").hide();
-    			}
-    			else if (program_state == "START_ECG_CALIBRATION")
-    			{
-    				console.log("START_ECG_CALIBRATION was called");
-    				$("#message").html( start_ecg_calibration_text );
-    				$("bloom").hide();
-    				$("#graph").hide();
-    			}
-    			else if (program_state == "BASELINE_COLLECTION")
-    			{
-    				$("#message").html( baseline_collection_text );
-    				$("#graph").show();
+    				$("#bloom").hide();
+    				$("#message").html( message );
 
     			}
-    			else if (program_state == "CONDITION")
+
+    			else if (instruction.name == "BASELINE_COLLECTION")
     			{
+    				$("#graph").show();
+    				$("#bloom").hide();
+
+    				var baseline_seconds = instruction.display_time;
+    				// start timer
+    				start_baseline_timer(baseline_seconds)
+
+    			}
+    			else if (instruction.name == "CONDITION_COLLECTION")
+    			{
+    				console.log("condition began");
+    				$("#graph").show();
+    				$("#bloom").show();
+
+    				var display_seconds = instruction.display_seconds; 
+
+    			}
+    			else if (instruction.name == "POST_EXPERIMENT")
+    			{
+    				$("#graph").show();
     				$("#bloom").show();
     			}
 
-    			if (eeg_state == "CONNECTED")
+    			else if (instruction.name == "CONNECTED")
     			{
-					$("#eeg_state").html( eeg_connected_text );
+    				if (instruction.type == "eeg"){
+						$("#eeg_state").html( eeg_connected_text );
+					}
+					else if (instruction.type == "ecg")
+					{
+						$("#ecg_state").html( eeg_connected_text );
+					}
     			}
-    			else if (eeg_state == "DISCONNECTED")
+    			else if (instruction.name == "DISCONNECTED")
     			{
-    				$("#eeg_state").html( eeg_disconnected_text );
-    			}
-
-
-    			if (ecg_state == "CONNECTED")
-    			{
-    				$("#ecg_state").html( ecg_connected_text );
-    			}
-    			else if (ecg_state == "DISCONNECTED")
-    			{
-					$("#ecg_state").html( ecg_disconnected_text );
+    				if (instruction.type == "eeg"){
+						$("#eeg_state").html( eeg_connected_text );
+					}
+					else if (instruction.type == "ecg")
+					{
+						$("#ecg_state").html( eeg_connected_text );
+					}
     			}
     		}
 
