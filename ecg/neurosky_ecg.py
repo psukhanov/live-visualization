@@ -366,6 +366,7 @@ if __name__ == "__main__":
     ##########################################
     sample_count = 0
     leadoff_count = 0
+    isreset=False
     while True:
         if not nskECG.isBufferEmpty():
             sample_count+=1
@@ -375,15 +376,22 @@ if __name__ == "__main__":
 
             if D['leadoff']==0 and sample_count > nskECG.Fs*2:
                 leadoff_count+=1
+                #print "leadoff", D['leadoff']
                 if leadoff_count>nskECG.Fs*2: #more than 2 seconds of leadoff, drop them
-                    if nskECG.getTotalNumRRI!=0: # we haven't reset recently, DO IT
+                    #if not isreset: # we haven't reset recently, DO IT
+                    if nskECG.analyze.tg_ecg_get_total_rri_count()!=0:
+                        isreset = True
                         ecgdict = [] #reset the buffer
                         nskECG.ecgResetAlgLib()
                         print "num rri post reset", nskECG.analyze.tg_ecg_get_total_rri_count()
                     nskECG.ecg_buffer.task_done()
                     continue
             else: # leadoff==200, or lead on
+                #print "done resetting, loading data again"
                 leadoff_count=0
+                if isreset:
+                    print "turning things back on"
+                    isreset = False
 
             D = nskECG.ecgalgAnalyzeRaw(D)
 
@@ -426,7 +434,7 @@ if __name__ == "__main__":
                 hrv =[x['hrv'] for x in ecgsub if 'hrv' in x]
 
                 if len(hrv) != 0:
-                    print "length hrv", hrv
+                    #print "length hrv", hrv
                     plt.axes(ax2)
                     ymin = float(min(hrv))-10
                     ymax = float(max(hrv))+10
