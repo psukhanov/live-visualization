@@ -107,3 +107,8 @@ circle {
 #countdown {
   margin-left: 20%;
 }
+
+.widget #instructions {
+  font-size: 36px;
+  line-height: 2.0;
+}

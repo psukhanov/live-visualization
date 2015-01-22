@@ -1,9 +1,17 @@
 $(document).ready(function() {
     $('#fullpage').fullpage({
-        // sectionsColor: ['#1bbc9b', '#4BBFC3', '#7BAABE', 'whitesmoke', '#ccddff'],
-        anchors: ['firstPage', 'secondPage', '3rdPage', '4thpage', 'lastPage'],
-        menu: '#menu',
-        css3: true,
-        scrollingSpeed: 1000
+        //Navigation
+        anchors: ['1', '2', '3', '4','5', '6', '7', '8', '9', 'lastpage'],
+        navigation: true,
+        navigationPosition: 'right',
+        slidesNavigation: true,
+
+        //Scrolling
+        loopTop: true,
+        loopBottom: true,
+        scrollingSpeed: 500,
+        // scrollBar: true,
+        easing: 'easeInQuart',
+        touchSensitivity: 15,
     });
 });

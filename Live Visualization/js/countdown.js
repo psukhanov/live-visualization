@@ -4,8 +4,8 @@ var countdown = $("#countdown").countdown360({
     seconds: 60,
     label: ['sec', 'secs'],
     fontColor: '#FFFFFF',
-    strokeStyle: '#398FBD',
-    fillStyle: '#6a8da7',
+    strokeStyle: '#f5f5f5',
+    fillStyle: '#e5603b',
     autostart: false,
     onComplete: function () {
       console.log('done');
