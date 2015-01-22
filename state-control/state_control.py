@@ -24,7 +24,7 @@ ZEN = 103
 
 class ChageYourBrainStateControl():
 
-    def __init__(self,client_name,sb_server,ecg,vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 20, condition_inst_sec = 20):
+    def __init__(self,client_name, sb_server,ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 20, condition_inst_sec = 20):
     	self.client_name = ###
     	self.sb_server = ###
     	self.ecg = ###
@@ -210,6 +210,9 @@ class ChageYourBrainStateControl():
             "value": value_out,
             "type": "string", "name": "EEG_ECG", "clientName": self.client_name}}
         self.sb_server.ws.send(json.dumps(message))
+
+	def output_post_experiment(self):
+
 
 	######################################################
 	### HELPER #############################

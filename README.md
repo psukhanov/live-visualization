@@ -13,6 +13,17 @@ and websocket-client in python:
 sudo pip install websocket-client
 ```
 Currently running this with 2 local servers (one producing fake data and routing to python client, a 2nd for sending to the visualization after processing is done in that client, along with ECG data & instructions as needed). 
+
+<h1>To Run</h1>
+
+Run 
+```
+./run.sh
+```
+from the main directory. And then open up the file <b>./Live Visualization/biodata_visualization.html</b>. Data is currently streaming to the page with the breathing pulse visulazation.
+
+<h1>Manually</h1>
+
 To have the 2 instances of Spacebrew running, do 
 ```
 node node_server_forever.js 
@@ -28,4 +39,14 @@ python biodata_spacebrew_client.py
 ```
 from the listeners directory in cloudbrew, and FINALLY, open up the biodata_visualization.html file in Live Visualization to start grabbing & plotting data! 
 
-(Will try to simplify process for further development). 
+<h1>Debugging</h1>
+
+Check status of spacebrew here:
+```
+http://spacebrew.github.io/spacebrew/admin/admin.html?server=localhost
+```
+add 
+```
+&port=9002 
+```
+at the end to see the live visualization
