@@ -24,9 +24,10 @@ ZEN = 103
 
 class ChageYourBrainStateControl():
 
-    def __init__(self,client_name,sb_server, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 20, condition_inst_sec = 20):
+    def __init__(self,client_name,sb_server,ecg,vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 20, condition_inst_sec = 20):
     	self.client_name = ###
     	self.sb_server = ###
+    	self.ecg = ###
 		self.experiment_state = NO_EXPERIMENT
 		self.condition_state = NO_CONDITION
 		self.tag_time = 0 #last time someone tagged in
@@ -75,24 +76,22 @@ class ChageYourBrainStateControl():
 	### STATE CHANGING ############
 	def start_setup_instructions(self):
 		#devNote: possibly add both time-in and time-out timer here which takes us back to (no experiment)
-		self.experiment_state = SETUP_INSTRUCTIONS
-		### change instructions to new style
-        instruction = {"message": {
-            "value" : "SETUP_INSTRUCTIONS",
-            "type": "string", "name": "instruction", "clientName": self.client_name}}    
-        self.sb_server.ws.send(json.dumps(instruction))
-        ### do_while_every looking for lead_on
-			if lead_on:
-				start_baseline_instructions()
+		self.experiment_state == SETUP_INSTRUCTIONS        
+		output_instruction()
+		do_every_while(self.vis_period,SETUP_INSTRUCTIONS,check_for_lead)
 
 	def start_baseline_instructions(self):
 		self.experiment_state = BASELINE_INSTRUCTIONS
-		instruction_timer = Timer(baseline_instruction_seconds,start_baseline_collection) #*** devNote: may want to send a countdown to visualization
-	    instruction_timer.start()
 	    output_instruction()
+		instruction_timer = Timer(self.baseline_instruction_seconds,start_baseline_collection) #*** devNote: may want to send a countdown to visualization
+	    instruction_timer.start()
 	    
 	def start_baseline_collection(self):
 		self.experiment_state = BASELINE_COLLECTION
+		instruction = {"message": {
+            "value" : {'instruction_name': 'BASELINE_COLLECTION', 'display_seconds': self.baseline_seconds},
+            "type": "string", "name": "instruction", "clientName": self.client_name}}    
+        self.sb_server.ws.send(json.dumps(instruction))
 		baseline_timer = Timer(self.baseline_seconds,start_post_baseline) #*** devNote: may want to send a countdown to visualization %%%
 	    baseline_timer.start()
 	    do_every_while(self.vis_period,BASELINE_COLLECTION,output_baseline) # instruct vis to start plotting 
@@ -101,17 +100,24 @@ class ChageYourBrainStateControl():
     	"""ask for confirmation + subjective feedback + selection of condition"""
 		self.experiment_state = BASELINE_CONFIRMATION
 		### confirm
+	    output_instruction('CONFIRMATION')
+	    time.sleep(1)
 		### collect subj info
-		### choose condition
+	    output_instruction('Q1')
+	    time.sleep(1)
+	    output_instruction('Q2')
+	    time.sleep(1)
+	    output_instruction('Q3')
+	    time.sleep(1)
     	###*** how to collect this keyboard input if window focus is not on console!??? 
     	start_condition_instructions()
 
 	def start_condition_instructions(self):
 		### differentiate between the three possible conditions (currently assuming breathing)
 		self.experiment_state = CONDITION_INSTRUCTIONS
-		instruction_timer = Timer(baseline_instruction_seconds,start_condition_collection) #*** devNote: may want to send a countdown to visualization
-	    instruction_timer.start()
 	    output_instruction()
+		instruction_timer = Timer(self.condition_instruction_seconds,start_condition_collection) #*** devNote: may want to send a countdown to visualization
+	    instruction_timer.start()
 
 	def start_condition_collection(self):
 		self.experiment_state = CONDITION_COLLECTION
@@ -133,16 +139,20 @@ class ChageYourBrainStateControl():
 	    output_instruction('Q2')
 	    time.sleep(1)
 	    output_instruction('Q3')
+	    time.sleep(1)
     	###*** how to collect this keyboard input if window focus is not on console!??? 
+		start_post_experiment()
 
     def start_post_experiment(self):
     	"""display aggregates and wait for new tag in!"""
-		self.experiment_state = NO_EXPERIMENT
+		self.experiment_state = POST_EXPERIMENT
 
 	######################################################
 	### SEND TO VISUALIZTION #############################
 
 	def output_instruction(self,sub_state=None):
+		if self.experiment_state == SETUP_INSTRUCTIONS:
+			instruction_text = ###
 		if self.experiment_state == BASELINE_INSTRUCTIONS:
 			instruction_text = ###
 		if self.experiment_state == CONDITION_INSTRUCTIONS:
@@ -160,7 +170,8 @@ class ChageYourBrainStateControl():
 				instruction_text = ###
 			else:
 				raise Exception ('Unkown sub_state for instruction sent in state ' + str(self.experiment_state)
-
+		else:
+			raise Exception ('Unkown state ({}) for instruction sent'.format(self.experiment_state))
 		instruction = {"message": {
             "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
             "type": "string", "name": "instruction", "clientName": self.client_name}}    
@@ -177,20 +188,28 @@ class ChageYourBrainStateControl():
 			alpha_out = 0
 		self.alpha_buffer = []
 
-		value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.hrv_last,time.time()-self.tag_time)
+		value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
         message = {"message": { #send synced EEG & ECG data here
             "value": value_out,
             "type": "string", "name": "EEG_ECG", "clientName": self.client_name}}
         self.sb_server.ws.send(json.dumps(message))
 
+	def output_condition(self):
+		"""output aggregated EEG and HRV values"""
+		# note: currently the same as output_baseline
+		if self.alpha_buffer:
+			alpha_out = mean(self.alpha_buffer)
+			self.alpha_save['time'].append(time.time())
+			self.alpha_save['value'].append(alpha_out)
+		else: 
+			alpha_out = 0
+		self.alpha_buffer = []
 
-	def output_condition_instructions(self):
-		instruction = {"message": {
-            "value" : "CONDITION_INSTRUCTIONS",
-            "type": "string", "name": "instruction", "clientName": self.client_name}}    
-        self.sb_server.ws.send(json.dumps(instruction))
-
-
+		value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
+        message = {"message": { #send synced EEG & ECG data here
+            "value": value_out,
+            "type": "string", "name": "EEG_ECG", "clientName": self.client_name}}
+        self.sb_server.ws.send(json.dumps(message))
 
 	######################################################
 	### HELPER #############################
@@ -208,6 +227,9 @@ class ChageYourBrainStateControl():
 			time.sleep(g.next())
 			f(*args)
 
+	def check_for_lead(self):
+		if self.ecg.is_lead_on():
+			start_baseline_instructions()
 
 	def keyboard_input(self):
 		#devNote: could do this smarter by not calling this function unless in one of the appropriate states

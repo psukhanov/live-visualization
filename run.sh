@@ -1,9 +1,11 @@
 #!/bin/bash
 
-wd=`pwd`
 cd ./Spacebrew-spacebrew-672a874/
+killall node
 node node_server_forever.js &
 sleep 1
-cd ../cloudbrain-master/connectors/spacebrew/
-python example_spacebrew_server.py 
+node node_server_forever.js -p 9002 &
+sleep 1
+cd ../cloudbrain-master/listeners/spacebrew/
+python example_spacebrew_client.py 
 #open "file://${wd}/Live Visualization/index.html?server=localhost"
