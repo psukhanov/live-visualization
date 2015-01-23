@@ -13,6 +13,7 @@ import time
 from websocket import create_connection
 import threading
 from math import *
+import webbrowser
 
 ECG_SIGNAL_IS_GOOD = 1
 
@@ -68,7 +69,7 @@ class SpacebrewClient(object):
 
         self.brew.add_publisher("eeg_ecg","string")
         self.brew.add_publisher("instruction","string")
-        self.brew.subscribe('alpha_relative',self.handle_value)
+        self.brew.subscribe('alpha_absolute',self.handle_value)
 
 
     def handle_value(self, string_value):
@@ -87,7 +88,7 @@ class SpacebrewClient(object):
 
         #print "path: %s" % path
 
-        if path == "alpha_relative" and ECG_SIGNAL_IS_GOOD:
+        if path == "alpha_absolute" and ECG_SIGNAL_IS_GOOD:
             self.timestamp+=1 #should start incrementing (internal) timestamps after we've acquired signal from both EEG and ECG
             eeg = random.random();
             value_out = [timestamp] + [(float(value[2])+float(value[3]))/2] + [eeg]
@@ -106,14 +107,13 @@ class SpacebrewClient(object):
         self.brew.start()
 
 
-
 class SpacebrewServer(object):
     def __init__(self, muse_ids=['fake-muse'], server='127.0.0.1', port=9000):
         self.server = server
         self.port = port
         self.muse_ids = muse_ids
         self.osc_paths = [
-            {'address': "/muse/elements/alpha_relative", 'arguments': 4},
+            {'address': "/muse/elements/alpha_absolute", 'arguments': 4},
         ]
 
         self.ws = create_connection("ws://%s:%s" % (self.server, self.port))
@@ -142,7 +142,26 @@ class SpacebrewServer(object):
                 }
             self.ws.send(json.dumps(config))    
         
+    def link(self, metric, publisher, subscriber):
+        message = {
+            "route": {
+                "type": "add",
+                "publisher": {
+                    "clientName": publisher,
+                    "name": metric,
+                    "type": "string",
+                    "remoteAddress": '127.0.0.1:9002'
+                },
+                "subscriber": {
+                    "clientName": subscriber,
+                    "name": metric,
+                    "type": "string",
+                    "remoteAddress": '127.0.0.1:9002'
+                }
 
+            }
+        }
+        self.ws.send(json.dumps(message))
         
 
     def start(self):
@@ -210,5 +229,44 @@ if __name__ == "__main__":
     #sb_client.start()
     listenerThread = ListenerThread()
     listenerThread.start()
+
+    #file_dir = os.path.dirname(os.path.realpath(__file__))
+
+    #hard-coding is bad! Somebody who knows python please find this file the right way 
+    biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live Visualization/biodata_visualization.html'
+
+    # MacOS
+    chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+
+    # Windows
+    # chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
+
+    # Linux
+    # chrome_path = '/usr/bin/google-chrome %s'
+
+    webbrowser.get(chrome_path).open(biodata_viz_url)
+    time.sleep(2) # we can't link the subscriber and publisher until the javascript client is up and running
+    #sb_server_2.link('eeg_ecg','booth-5','Change_your_mind')
+    #sb_server_2.link('eeg_ecg','booth-5','Change_your_mind')
+    sb_server_2.ws.send(json.dumps({"admin": [{"admin": True, "no_msgs": False}]}))
+    message = {
+            "route": {
+                "type": "add",
+                "publisher": {
+                    "clientName": 'booth-5',
+                    "name": 'eeg_ecg',
+                    "type": "string",
+                    "remoteAddress": '127.0.0.1:9002'
+                },
+                "subscriber": {
+                    "clientName": 'Change_your_mind',
+                    "name": 'eeg_ecg',
+                    "type": "string",
+                    "remoteAddress": '127.0.0.1:9002'
+                }
+
+            }
+        }
+    sb_server_2.ws.send(json.dumps(message))
 
 
