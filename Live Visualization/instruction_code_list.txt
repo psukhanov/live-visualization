@@ -1,5 +1,8 @@
 List of Codes to pass from biodata_spacebrew_client.py to biodata_visualization.html 
 
+
+Channel: instruction
+
 All codes are passed as JSON via the Spacebrew channel "instruction". 
 All the json objects have a key "instruction_name", which is the name of the instruction. Possible values are:
 
@@ -43,3 +46,9 @@ additional_parameters:
 DISCONNECTED -> either the eeg or the ecg has stopped sending data. Update the eeg_connected or ecg_connected label. 
 additional_parameters: 
 	type: either "eeg" or "ecg"	
+
+Channel: eeg_ecg
+	keys
+	timestamp : timestamp of eeg and ecg value to plot
+	eeg: alpha_absolute averaged over 2 sensors
+	ecg: raw ecg or hrv (depending on type of graph?) 

@@ -1064,6 +1064,14 @@
 		}
 
 
+		// Paul S Code - shortcut for moving to any section
+		$(document).on('goTo',function(e,index){
+			console.log('goTo was called with parameter');
+			console.log(index);
+
+			$.fn.fullpage.moveTo(index);
+		});
+
 		/**
 		 * Sliding with arrow keys, both, vertical and horizontal
 		 */

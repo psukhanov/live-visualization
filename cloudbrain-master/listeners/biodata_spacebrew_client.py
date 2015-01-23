@@ -12,6 +12,7 @@ import json
 import time
 from websocket import create_connection
 import threading
+from math import *
 
 ECG_SIGNAL_IS_GOOD = 1
 
@@ -77,11 +78,19 @@ class SpacebrewClient(object):
         path = value[0]
         timestamp = value[5]
 
+        '''if (int(timestamp) % 5 == 0):
+            instruction = {"message": {
+                "value" : {"instruction_name": "DISPLAY_INSTRUCTION", "instruction_text": "testing 1 2 3 yeah"},
+                "type": "string", "name": "instruction", "clientName": self.client_name}}
+        
+            sb_server_2.ws.send(json.dumps(instruction))'''
+
         #print "path: %s" % path
 
         if path == "alpha_relative" and ECG_SIGNAL_IS_GOOD:
             self.timestamp+=1 #should start incrementing (internal) timestamps after we've acquired signal from both EEG and ECG
-            value_out = [path] + [timestamp] + [(float(value[2])+float(value[3]))/2]
+            eeg = random.random();
+            value_out = [timestamp] + [(float(value[2])+float(value[3]))/2] + [eeg]
             message = {"message": { #send synced EEG & ECG data here
                 "value": value_out,
                 "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
@@ -154,8 +163,6 @@ class SpacebrewServer(object):
                     self.ws.send(json.dumps(message))
 
 
-
-
 class ServerThread ( threading.Thread ):
     
     def __init__(self):
@@ -205,7 +212,3 @@ if __name__ == "__main__":
     listenerThread.start()
 
 
-    instruction = {"message": {
-                "value" : "BASELINE_INSTRUCTIONS",
-                "type": "string", "name": "instruction", "clientName": "Visualization"}}    
-    sb_server.ws.send(json.dumps(instruction))
