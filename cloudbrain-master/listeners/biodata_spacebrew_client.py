@@ -1,5 +1,3 @@
-__author__ = 'mpesavento'
-
 # add the shared settings file to namespace
 import sys, random
 import argparse
@@ -12,6 +10,8 @@ import json
 import time
 from websocket import create_connection
 import threading
+from state_control import ChangeYourBrainStateControl
+from subprocess import call
 
 ECG_SIGNAL_IS_GOOD = 1
 
@@ -134,8 +134,6 @@ class SpacebrewServer(object):
             self.ws.send(json.dumps(config))    
         
 
-        
-
     def start(self):
         time_stamp = 0
         while 1:
@@ -154,6 +152,23 @@ class SpacebrewServer(object):
                     self.ws.send(json.dumps(message))
 
 
+
+class ecg_fake():
+
+    def __init__(self):
+        self.lead_count = 0
+        
+    def is_lead_on(self):
+        self.lead_count += 1
+        if self.lead_count > 5:
+            print 'lead on'
+            return True
+        else:
+            print 'lead off'
+            return False
+
+    def get_hrv(self):
+        return 1
 
 
 class ServerThread ( threading.Thread ):
@@ -204,8 +219,19 @@ if __name__ == "__main__":
     listenerThread = ListenerThread()
     listenerThread.start()
 
+    ecg = ecg_fake()
 
-    instruction = {"message": {
-                "value" : "BASELINE_INSTRUCTIONS",
-                "type": "string", "name": "instruction", "clientName": "Visualization"}}    
-    sb_server.ws.send(json.dumps(instruction))
+    call(["open", "Live Visualization/biodata_visualization.html"])
+    time.sleep(8)
+
+    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
+    sc.tag_in()
+    
+    # time.sleep(4)
+
+    # instruction_text = "TEST TEST TEST"
+    # instruction = {"message": {
+    #     "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
+    #     "type": "string", "name": "instruction", "clientName": 'booth-5'}}    
+    # sb_server_2.ws.send(json.dumps(instruction))
+
