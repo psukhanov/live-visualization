@@ -1,176 +1,164 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-<title>Live Visualization</title>
-<meta charset="utf-8">
-<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
-<link rel="stylesheet" href="css/jquery.fullPage.css" type="text/css" media="screen" charset="utf-8" />
-<script type="text/javascript" src="js/jq.js"></script>
-<script type="text/javascript" src="js/sb-1.4.1.js"></script>
-<script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
-<script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
-</head>
-<body class="background-dark">
-<div class="container">
-<header class="page-header">
-<div class="navbar">
-<div class="logo pull-left">
-<h2><a href="index.html">Change Your Mind</strong></a> <small>0.1</small></h2>
-</div>
-</div>
-</header>
-<div class="content" id="fullpage">
-<div class="row section" id="section">
-<div class="col-lg-12">
-<section class="widget">
-<header>
-<h4>
-Instructions
-</h4>
-</header>
-<div id="instructions">
-"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-</div>
-</section>
-</div>
-</div>
-<div class="row section" id="section">
-<div class="col-lg-6">
-<section class="widget">
-<header>
-<h4>
-EEG Baseline Collection
-</h4>
-</header>
-<div class="histogram">
-<div id="eeg_graph"></div>
-</div>
-</section>
-<section class="widget">
-<header>
-<h4>
-ECG Baseline Collection
-</h4>
-</header>
-<div class="histogram">
-<div id="ecg_graph"></div>
-</div>
-</section>
-</div>
-<div class="col-lg-6">
-<section class="widget">
-<header>
-<h4>
-More Information &nbsp;
-<span class="label label-danger">Instructions</span>
-</h4>
-</header>
-<div class="widget-body">
-<!-- <div id="msg-content"></div> -->
-<div id="message"></div>
-<div id="countdown"></div>
-</div>
-</section>
-</div>
-</div>
-<div class="row section" id="section">
-<div class="col-lg-6">
-<section class="widget">
-<header>
-<h4>
-Baseline vs Actual
-</h4>
-</header>
-<div class="histogram">
-<div id="eeg_graph_baseline"></div>
-<div id="legend"></div>
-</br></br>
-<div id="name">Trying to connect</div>
-</div>
-</section>
-<section class="widget">
-<header>
-<h4>ECG Readings
-<small>Real-time Plot</small>
-</h4>
-</header>
-<div class="histogram">
-<div id="ecg_graph_baseline"></div>
-<div id="legend2"></div>
-</br></br>
-<div id="name">Trying to connect</div>
-</div>
-</section>
-</div>
-<div class="col-lg-6">
-<section class="widget">
-<header>
-<h4>
-Breath
-<small>breathing visualization</small>
-</h4>
-</header>
-<div id="bloom"></div>
-</section>
-</div>
-</div>
-<div class="row section" id="section">
-<div class="col-lg-12">
-<section class="widget">
-<header>
-<h4>
-Results Page
-</h4>
-</header>
-<div id="barchart1">
-pass
-</div>
-</section>
-</div>
-</div>
-</div>
-</div>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script type="text/javascript" src="js/bloom.js"></script>
-<script type="text/javascript">
-// variables to change
-var bufferLength = 120;
-var port_in = 9002;
-var host = '127.0.0.1';
-// display messages
-var eeg_disconnected_text = "EEG: Not Connected";
-var ecg_disconnected_text = "ECG: Not Connected";
-var eeg_connected_text = "EEG: Connected";
-var ecg_connected_text = "ECG: Connected";
-var not_started_text = "Please swipe your RFID tag to begin.";
-// initialize program variables
-var eeg_state = "DISCONNECTED";
-var ecg_state = "DISCONNECTED";
-var eeg_buffer = [];
-var ecg_buffer = [];
+    <head>
+        <title>Live Visualization</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="css/jquery.fullPage.css" type="text/css" media="screen" charset="utf-8" />
+        <script type="text/javascript" src="js/jq.js"></script>
+        <script type="text/javascript" src="js/sb-1.4.1.js"></script>
+        <script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
+        <script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
+    </head>
+    <body class="background-dark">
+        <div class="container">
 
+            <header class="page-header">
+                <div class="navbar">
+                    <div class="logo pull-left">
+                        <h2><a href="index.html">Change Your Mind</strong></a> <small>0.1</small></h2>
+                    </div>
+                </div>
+            </header>
 
-var sb, app_name = "Change_your_mind"; //Biodata (ECG + EEG viz) is booth 5!
-var app_description = "Charts realtime alpha_relative to baseline (EEG) and HRV relative to baseline (ECG) data";
-// when window loads call the setup method
-$(window).on("load", setup);
-// Spacebrew Object
-//set up graph & axes in Rickshaw
-var eeg_graph_baseline = new Rickshaw.Graph( {
-element: document.querySelector("#eeg_graph_baseline"),
-width: 500,
-height: 200,
-renderer: 'line',
-series: [{
-color: 'steelblue',
-data: []
-}]
-});
+            <div class="content" id="fullpage">
+                <div class="row section" id="section">
+                    <div class="col-lg-12">
+                        <section class="widget">
+                            <header>
+                                <h4>Instructions</h4>
+                            </header>
+                            <div id="instructions">"Please swipe your RFID tag to begin"</div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="row section" id="section">
+                    <div class="col-lg-6">
+                        <section class="widget">
+                            <header>
+                                <h4>EEG Baseline Collection</h4>
+                            </header>
+                            <div class="histogram">
+                                <div id="eeg_graph_baseline"></div>
+                            </div>
+                        </section>
+                        <section class="widget">
+                            <header>
+                                <h4>ECG Baseline Collection</h4>
+                            </header>
+                            <div class="histogram">
+                                <div id="ecg_graph_baseline"></div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-lg-6">
+                        <section class="widget">
+                            <header>
+                                <h4>More Information &nbsp;<span class="label label-danger">Instructions</span></h4>
+                            </header>
+                            <div class="widget-body">
+                            <!-- <div id="msg-content"></div> -->
+                                <div id="message"></div>
+                                <div id="countdown"></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="row section" id="section">
+                    <div class="col-lg-6">
+                        <section class="widget">
+                            <header>
+                                <h4>Baseline vs Actual</h4>
+                            </header>
+                            <div class="histogram">
+                                <div id="eeg_graph_condition"></div>
+                                <div id="legend"></div>
+                                </br></br>
+                                <div id="name">Trying to connect</div>
+                            </div>
+                        </section>
+                        <section class="widget">
+                            <header>
+                                <h4>ECG Readings
+                                    <small>Real-time Plot</small>
+                                </h4>
+                            </header>
+                            <div class="histogram">
+                                <div id="ecg_graph_baseline"></div>
+                                <div id="legend2"></div>
+                                </br></br>
+                                <div id="name">Trying to connect</div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="col-lg-6">
+                        <section class="widget">
+                            <header>
+                                <h4>Breath
+                                    <small>breathing visualization</small>
+                                </h4>
+                            </header>
+                            <div id="bloom"></div>
+                        </section>
+                    </div>
+                </div>
+
+                <div class="row section" id="section">
+                    <div class="col-lg-12">
+                        <section class="widget">
+                            <header>
+                                <h4>Results Page</h4>
+                            </header>
+                            <div id="barchart1">pass</div>
+                        </section>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script type="text/javascript" src="js/bloom.js"></script>
+        <script type="text/javascript">
+            // variables to change
+            var bufferLength = 120;
+            var port_in = 9002;
+            var host = '127.0.0.1';
+            // display messages
+            var eeg_disconnected_text = "EEG: Not Connected";
+            var ecg_disconnected_text = "ECG: Not Connected";
+            var eeg_connected_text = "EEG: Connected";
+            var ecg_connected_text = "ECG: Connected";
+            var not_started_text = "Please swipe your RFID tag to begin.";
+            // initialize program variables
+            var eeg_state = "DISCONNECTED";
+            var ecg_state = "DISCONNECTED";
+            var eeg_buffer = [];
+            var ecg_buffer = [];
+
+            var sb, app_name = "Change_your_mind"; //Biodata (ECG + EEG viz) is booth 5!
+            var app_description = "Charts realtime alpha_relative to baseline (EEG) and HRV relative to baseline (ECG) data";
+            // when window loads call the setup method
+            $(window).on("load", setup);
+            // Spacebrew Object
+            //set up graph & axes in Rickshaw
+            var eeg_graph_baseline = new Rickshaw.Graph( {
+                element: document.querySelector("#eeg_graph_baseline"),
+                width: 500,
+                height: 200,
+                renderer: 'line',
+                series: [{
+                    color: 'steelblue',
+                data: []
+                    }]
+                });
 
 var ecg_graph_baseline = new Rickshaw.Graph( {
 element: document.querySelector("#ecg_graph_baseline"),

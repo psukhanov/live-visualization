@@ -1,5 +1,3 @@
-__author__ = 'mpesavento'
-
 # add the shared settings file to namespace
 import sys, random
 import argparse
@@ -14,6 +12,9 @@ from websocket import create_connection
 import threading
 from math import *
 import webbrowser
+from state_control import ChangeYourBrainStateControl
+from subprocess import call
+
 
 ECG_SIGNAL_IS_GOOD = 1
 
@@ -182,6 +183,25 @@ class SpacebrewServer(object):
                     self.ws.send(json.dumps(message))
 
 
+
+class ecg_fake():
+
+    def __init__(self):
+        self.lead_count = 0
+        
+    def is_lead_on(self):
+        self.lead_count += 1
+        if self.lead_count > 5:
+            print 'lead on'
+            return True
+        else:
+            print 'lead off'
+            return False
+
+    def get_hrv(self):
+        return 1
+
+
 class ServerThread ( threading.Thread ):
     
     def __init__(self):
@@ -230,6 +250,8 @@ if __name__ == "__main__":
     listenerThread = ListenerThread()
     listenerThread.start()
 
+    ecg = ecg_fake()
+
     #file_dir = os.path.dirname(os.path.realpath(__file__))
 
     #hard-coding is bad! Somebody who knows python please find this file the right way 
@@ -244,29 +266,16 @@ if __name__ == "__main__":
     # Linux
     # chrome_path = '/usr/bin/google-chrome %s'
 
-    webbrowser.get(chrome_path).open(biodata_viz_url)
-    time.sleep(2) # we can't link the subscriber and publisher until the javascript client is up and running
-    #sb_server_2.link('eeg_ecg','booth-5','Change_your_mind')
-    #sb_server_2.link('eeg_ecg','booth-5','Change_your_mind')
-    sb_server_2.ws.send(json.dumps({"admin": [{"admin": True, "no_msgs": False}]}))
-    message = {
-            "route": {
-                "type": "add",
-                "publisher": {
-                    "clientName": 'booth-5',
-                    "name": 'eeg_ecg',
-                    "type": "string",
-                    "remoteAddress": '127.0.0.1:9002'
-                },
-                "subscriber": {
-                    "clientName": 'Change_your_mind',
-                    "name": 'eeg_ecg',
-                    "type": "string",
-                    "remoteAddress": '127.0.0.1:9002'
-                }
+    webbrowser.get(chrome_path).open(biodata_viz_url)    time.sleep(8)
 
-            }
-        }
-    sb_server_2.ws.send(json.dumps(message))
+    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
+    sc.tag_in()
+    
+    # time.sleep(4)
 
+    # instruction_text = "TEST TEST TEST"
+    # instruction = {"message": {
+    #     "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
+    #     "type": "string", "name": "instruction", "clientName": 'booth-5'}}    
+    # sb_server_2.ws.send(json.dumps(instruction))
 

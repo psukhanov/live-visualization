@@ -176,10 +176,10 @@ class ChangeYourBrainStateControl( object ):
         else:
             raise Exception ('Unkown state ({}) for instruction sent'.format(self.experiment_state))
         print "output instruction: {}".format(instruction_text) #^^^
-        # instruction = {"message": {
-  #           "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
-  #           "type": "string", "name": "instruction", "clientName": self.client_name}}    
-  #       self.sb_server.ws.send(json.dumps(instruction))
+        instruction = {"message": {
+            "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
+            "type": "string", "name": "instruction", "clientName": self.client_name}}    
+        self.sb_server.ws.send(json.dumps(instruction))
 
     def output_baseline(self):
         """output aggregated EEG and HRV values"""
