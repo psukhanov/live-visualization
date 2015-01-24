@@ -94,10 +94,11 @@ class ChangeYourBrainStateControl( object ):
              "type": "string", "name": "instruction", "clientName": self.client_name}}    
          self.sb_server.ws.send(json.dumps(instruction))
         print "start baseline collection" #^^^
+
         baseline_timer = Timer(self.baseline_seconds,self.start_post_baseline) #*** devNote: may want to send a countdown to visualization %%%
         baseline_timer.start()
         #self.output_go_to_baseline()
-        self.do_every_while(self.vis_period,BASELINE_COLLECTION,self.output_baseline) # instruct vis to start plotting 
+        #self.do_every_while(self.vis_period,BASELINE_COLLECTION,self.output_baseline) # instruct vis to start plotting 
 
     def start_post_baseline(self):
         """ask for confirmation + subjective feedback + selection of condition"""
