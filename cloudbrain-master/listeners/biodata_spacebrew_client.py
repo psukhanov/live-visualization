@@ -255,16 +255,19 @@ if __name__ == "__main__":
     #file_dir = os.path.dirname(os.path.realpath(__file__))
 
     #hard-coding is bad! Somebody who knows python please find this file the right way 
-    biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live Visualization/biodata_visualization.html'
 
-    # MacOS
-    chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+    #biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live Visualization/biodata_visualization.html'
+    biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
-    # Windows
-    # chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
 
-    # Linux
-    # chrome_path = '/usr/bin/google-chrome %s'
+    if sys.platform == 'win32': #windoze
+        chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
+    elif sys.platform == 'darwin': # MAC OSX
+        chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+    else: # Linux
+        chrome_path = '/usr/bin/google-chrome %s'
+
+
 
     webbrowser.get(chrome_path).open(biodata_viz_url)    
     time.sleep(8)

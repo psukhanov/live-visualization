@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Live Visualization</title>
+
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+		<link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+		<script type="text/javascript" src="js/jq.js"></script>
+		<script type="text/javascript" src="js/sb-1.4.1.js"></script>
+		<script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
+		<script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
+		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+		<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
+	</head>
+
+	<body>
+		<!--<div>
+			userID:<input id="userID" />
+			start:<input id="start" />
+			end:<input id="end" />
+		</div>	
+		<div>
+			<a class="button" id="button">Send</a>
+		</div> -->
+		<div id="test"></div>
+		<div id="x_axis"></div>
+		<div id="test2"></div>
+		</br></br>
+		<div id="name">Trying to connect</div>
+
+<script type="text/javascript">
+		  
+			// when window loads call the setup method
+			$(window).on("load", setup);
+
+			// Spacebrew Object
+			var sb
+				, app_name = "booth-5"
+				;
+			var histData;
+			var chart = new Rickshaw.Graph( {
+			element: document.querySelector("#test"),
+			width: 800,
+			height: 400,
+			renderer: 'line',
+			series: [{
+				color: 'steelblue',
+				data: []
+				}]
+				});
+
+			var chart2 = new Rickshaw.Graph( {
+			element: document.querySelector("#test2"),
+			width: 800,
+			height: 400,
+			renderer: 'line',
+			series: [{
+				color: 'red',
+				data: []
+				}]
+				});
+
+
+			var xAxis = new Rickshaw.Graph.Axis.X({
+    			graph: chart,
+    			orientation: 'bottom',
+				element: document.getElementById('x_axis')
+				});
+			xAxis.render();
+
+			var yAxis = new Rickshaw.Graph.Axis.Y({
+    		graph: chart
+				});
+			yAxis.render();
+
+			var bufferLength = 120; 
+			var buffer = [];
+
+			var userID, start, end;
+
+			/**
+			* setup Function that connect to spacebrew and creates a listener for clicks of the submit button.
+			*/
+			function setup (){
+
+				// setup spacebrew
+				sb = new Spacebrew.Client('server.neuron.brain');  // create spacebrew client object
+
+				sb.name(app_name);
+				sb.description("This app sends text from an HTML form."); // set the app description
+
+		        // create the spacebrew subscription channels
+				sb.addSubscribe("eeg", "string");		// create the subscription feed
+
+				// configure the publication and subscription feeds
+				sb.onStringMessage = onStringMessage;		
+				sb.onOpen = onOpen;
+
+				// connect to spacbrew
+				sb.connect();  
+				$("#button").on("mousedown", onMouseDown);
+
+			}
+
+			/**
+			 * Function that is called when Spacebrew connection is established
+			 */
+			function onOpen() {
+				var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+				$("#name").html( message );
+			}
+
+			/**
+			* onMouseDown Function that is called when the submit button is pressed. It reads the
+			*     text in the input box, and then sends it to spacebrew. It accepts a mouse event
+			*     object, though we don't use it in this example.
+			*/
+			function onMouseDown (evt){
+
+				//get inputs values to perform request	
+
+			/*var useridvalue=encodeURIComponent(document.getElementById("userID").value);
+			var startvalue=encodeURIComponent(document.getElementById("start").value);
+			var endvalue=encodeURIComponent(document.getElementById("end").value);*/
+
+			userID="1";
+			start="1418446050";
+			end="1418446950";
+			url = "http://cloudbrain.rocks/data?userId="+userID+"&metric=concentration&start="+start+"&end="+end;
+			response = historyCall(url);
+
+			}
+
+
+			/**
+			 * onStringMessage Function that is called whenever new spacebrew string messages are received.
+			 *          It accepts two parameters:
+			 * @param  {String} name    Holds name of the subscription feed channel
+			 * @param  {String} value 	Holds value received from the subscription feed
+			 */
+			function onStringMessage( name, value ){
+				console.log("[onStringMessage] string message received ", value);
+				//$("#msg_received").text(value); // display the sent message in the browser  
+
+				var  values = value.split(',');
+				if (buffer.length > bufferLength){
+					buffer.shift();
+				}
+					buffer.push({"x":+values[4],"y":+values[0]});
+					
+					
+				//update_chart(buffer);  
+				//yAxis.render();
+				//alert(value[1]);  
+			}
+
+
+
+			function historyCall(url) {
+       		 	$.ajax({
+            		type: "GET",
+            		url: url,
+            		dataType: "jsonp",
+            		callback: "callback",
+            		success: function (data) {
+                		//alert(data[0].timestamp);
+
+                		init_chart(data);
+                		//result = JSON.parse(json);
+           			 },
+        		});
+    		}        
+
+    		function init_chart(data)
+    		{
+					chart2.series[0].data = data;
+    				chart2.render(); 
+    		}
+
+    		function update_chart(data)
+    		{
+    			chart.series[0].data = data;
+    			chart.render(); 
+    			//console.log(chart.series[0].data[0]);
+    		}
+
+	    </script>
+	</body>
+
+</html>
