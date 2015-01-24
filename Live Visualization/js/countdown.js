@@ -12,7 +12,7 @@ var countdown = $("#countdown").countdown360({
     }
 });
 
-countdown.start();
+//countdown.start();
 
 $('#countdown').click(function() {
   countdown.extendTimer(15);

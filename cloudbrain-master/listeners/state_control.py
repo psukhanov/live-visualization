@@ -33,7 +33,7 @@ class ChangeYourBrainStateControl( object ):
         self.tag_time = 0 #last time someone tagged in
         self.vis_period = vis_period_sec
         self.baseline_seconds = baseline_sec
-        self.condition_seconds = condition_sec
+        self.condition_seconds = baseline_sec
         self.baseline_instruction_seconds = baseline_inst_sec 
         self.condition_instruction_seconds = condition_inst_sec
 
@@ -89,14 +89,13 @@ class ChangeYourBrainStateControl( object ):
         
     def start_baseline_collection(self):
         self.experiment_state = BASELINE_COLLECTION
-         instruction = {"message": {
-             "value" : {'instruction_name': 'BASELINE_COLLECTION', 'display_seconds': '30'},
-             "type": "string", "name": "instruction", "clientName": self.client_name}}    
-         self.sb_server.ws.send(json.dumps(instruction))
+        # instruction = {"message": {
+  #           "value" : {'instruction_name': 'BASELINE_COLLECTION', 'display_seconds': self.baseline_seconds},
+  #           "type": "string", "name": "instruction", "clientName": self.client_name}}    
+  #       self.sb_server.ws.send(json.dumps(instruction))
         print "start baseline collection" #^^^
         baseline_timer = Timer(self.baseline_seconds,self.start_post_baseline) #*** devNote: may want to send a countdown to visualization %%%
         baseline_timer.start()
-        #self.output_go_to_baseline()
         self.do_every_while(self.vis_period,BASELINE_COLLECTION,self.output_baseline) # instruct vis to start plotting 
 
     def start_post_baseline(self):
@@ -182,14 +181,6 @@ class ChangeYourBrainStateControl( object ):
             "type": "string", "name": "instruction", "clientName": self.client_name}}    
         self.sb_server.ws.send(json.dumps(instruction))
 
-    def output_go_to_baseline(self):
-        value_out = {"instruction_name":"BASELINE_COLLECTION","display_seconds":self.baseline_seconds}
-        message = {"message": { 
-             "value": value_out,
-             "type": "string", "name": "instruction", "clientName": self.client_name}}
-         self.sb_server.ws.send(json.dumps(message))
-        print "output condition: {}".format(value_out) #^^^
-
     def output_baseline(self):
         """output aggregated EEG and HRV values"""
         #devNote: possibly switch to outputting raw ECG instead of HRV during baseline
@@ -202,10 +193,10 @@ class ChangeYourBrainStateControl( object ):
         self.alpha_buffer = []
 
         value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
-         message = {"message": { #send synced EEG & ECG data here
-             "value": value_out,
-             "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
-         self.sb_server.ws.send(json.dumps(message))
+        # message = {"message": { #send synced EEG & ECG data here
+        #     "value": value_out,
+        #     "type": "string", "name": "EEG_ECG", "clientName": self.client_name}}
+        # self.sb_server.ws.send(json.dumps(message))
         print "output baseline: {}".format(value_out) #^^^
 
 
@@ -221,10 +212,10 @@ class ChangeYourBrainStateControl( object ):
         self.alpha_buffer = []
 
         value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
-         message = {"message": { #send synced EEG & ECG data here
-             "value": value_out,
-             "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
-         self.sb_server.ws.send(json.dumps(message))
+        # message = {"message": { #send synced EEG & ECG data here
+        #     "value": value_out,
+        #     "type": "string", "name": "EEG_ECG", "clientName": self.client_name}}
+        # self.sb_server.ws.send(json.dumps(message))
         print "output condition: {}".format(value_out) #^^^
 
     def output_post_experiment(self):

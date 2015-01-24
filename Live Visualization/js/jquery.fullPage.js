@@ -1068,7 +1068,6 @@
 		$(document).on('goTo',function(e,index){
 			console.log('goTo was called with parameter');
 			console.log(index);
-
 			$.fn.fullpage.moveTo(index);
 		});
 

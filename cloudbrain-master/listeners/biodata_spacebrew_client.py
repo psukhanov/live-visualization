@@ -91,8 +91,8 @@ class SpacebrewClient(object):
 
         if path == "alpha_absolute" and ECG_SIGNAL_IS_GOOD:
             self.timestamp+=1 #should start incrementing (internal) timestamps after we've acquired signal from both EEG and ECG
-            eeg = random.random();
-            value_out = [timestamp] + [(float(value[2])+float(value[3]))/2] + [eeg]
+            ecg = random.random();
+            value_out = [timestamp] + [(float(value[2])+float(value[3]))/2] + [ecg]
             message = {"message": { #send synced EEG & ECG data here
                 "value": value_out,
                 "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
@@ -180,7 +180,7 @@ class SpacebrewServer(object):
                     message = {"message": {
                         "value": value,
                         "type": "string", "name": metric, "clientName": muse_id}}    
-                    self.ws.send(json.dumps(message))
+                   # self.ws.send(json.dumps(message))
 
 
 
@@ -266,16 +266,10 @@ if __name__ == "__main__":
     # Linux
     # chrome_path = '/usr/bin/google-chrome %s'
 
-    webbrowser.get(chrome_path).open(biodata_viz_url)    time.sleep(8)
+    webbrowser.get(chrome_path).open(biodata_viz_url)    
+    time.sleep(8)
 
     sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
     sc.tag_in()
     
-    # time.sleep(4)
-
-    # instruction_text = "TEST TEST TEST"
-    # instruction = {"message": {
-    #     "value" : {'instruction_name': 'DISPLAY_INSTRUCTION', 'instruction_text': instruction_text},
-    #     "type": "string", "name": "instruction", "clientName": 'booth-5'}}    
-    # sb_server_2.ws.send(json.dumps(instruction))
 
