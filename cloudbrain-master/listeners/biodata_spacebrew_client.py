@@ -250,8 +250,8 @@ if __name__ == "__main__":
         chrome_path = '/usr/bin/google-chrome %s'
 
 
-
-    webbrowser.get(chrome_path).open(biodata_viz_url)    
+    #webbrowser.get(chrome_path).open(biodata_viz_url)    
+    webbrowser.open(biodata_viz_url)    
     time.sleep(4)
 
     sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 10, condition_sec = 10, baseline_inst_sec = 2, condition_inst_sec = 2)
