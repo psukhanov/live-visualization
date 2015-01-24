@@ -259,7 +259,14 @@ class NeuroskyECG(object):
 
     def _ecgInitAlgLib(self,libname='TgEcgAlg64.dll', power_frequency=60):
         """ initialize the TgEcg algorithm dll """
-        print "loading analysis library: " + libname
+
+        if sys.maxsize > (2**32)/2-1: #running 64 bit
+            libname = 'TgEcgAlg64.dll'
+        else:
+            print "loading 32 bit"
+            #libname = 'TgEcgAlg.dll'
+            libname = 'tg_ecg.so'
+        print "loading analysis library: ", libname
         E = cdll.LoadLibrary(libname)
         
         E.tg_ecg_do_hrv_sdnn(0)
@@ -328,7 +335,8 @@ if __name__ == "__main__":
     sys.ps1 = 'IAMAHACK'
 
 
-    target_port = 'COM8'
+    target_port = 'COM3'  #production windows box
+    #target_port = 'COM8' #mike's laptop
 
     plot_fig=True
 
