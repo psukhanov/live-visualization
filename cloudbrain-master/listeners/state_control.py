@@ -47,7 +47,9 @@ class ChangeYourBrainStateControl( object ):
 
     ### CALLED VIA SPACEBREW CLIENT LISTENER ############
     def process_eeg_alpha(self,value):
-        self.alpha_buffer.append(value)
+        arrValue = value.split(',')
+        self.alpha_buffer.append(arrValue)
+        #print('process_eeg_alpha called')
         ### make sure buffer gets clear when no subjects
         ### log data
         
@@ -72,6 +74,9 @@ class ChangeYourBrainStateControl( object ):
         ### save logged data and reset variables
         self.alpha_save = {'time': [], 'value':[]}
         self.hrv_save = {'time': [], 'value': []}
+
+        self.alpha_save_baseline = {'time': [], 'value':[]}
+        self.hrv_save_baseline = {'time': [], 'value':[]}
 
     ######################################################
     ### STATE CHANGING ############
@@ -197,11 +202,11 @@ class ChangeYourBrainStateControl( object ):
         """output aggregated EEG and HRV values"""
         #devNote: possibly switch to outputting raw ECG instead of HRV during baseline
         if self.alpha_buffer:
-            alpha_out = mean(self.alpha_buffer)
-            self.alpha_save['time'].append(time.time())
-            self.alpha_save['value'].append(alpha_out)
+            alpha_out = (float(self.alpha_buffer[0][1])+float(self.alpha_buffer[0][2]))/2
+            self.alpha_save_baseline['time'].append(time.time())
+            self.alpha_save_baseline['value'].append(alpha_out)
         else: 
-            alpha_out = 0
+            alpha_out = 1
         self.alpha_buffer = []
 
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
@@ -216,11 +221,11 @@ class ChangeYourBrainStateControl( object ):
         """output aggregated EEG and HRV values"""
         # note: currently the same as output_baseline
         if self.alpha_buffer:
-            alpha_out = mean(self.alpha_buffer)
+            alpha_out = (float(self.alpha_buffer[0][1])+float(self.alpha_buffer[0][2]))/2
             self.alpha_save['time'].append(time.time())
             self.alpha_save['value'].append(alpha_out)
         else: 
-            alpha_out = 0
+            alpha_out = 1
         self.alpha_buffer = []
 
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
@@ -231,6 +236,25 @@ class ChangeYourBrainStateControl( object ):
         print "output condition: {}".format(value_out) #^^^
 
     def output_post_experiment(self):
+
+        if (len(self.alpha_save_baseline['value']) > 0):
+            baseline_alpha = sum(self.alpha_save_baseline['value'])/len(self.alpha_save_baseline['value'])
+        else:
+            baseline_alpha = 0
+
+        if (len(self.alpha_save['value']) > 0):
+            condition_alpha = sum(self.alpha_save['value'])/len(self.alpha_save['value'])
+        else:
+            condition_alpha = 0
+
+        baseline_hrv = 1
+        condition_hrv = 1.5
+
+        value_out = {"instruction_name":"POST_EXPERIMENT","baseline_hrv":baseline_hrv,"baseline_alpha":baseline_alpha,"condition_alpha":condition_alpha,"condition_hrv":condition_hrv}
+        message = {"message": { 
+             "value": value_out,
+             "type": "string", "name": "instruction", "clientName": self.client_name}}
+        self.sb_server.ws.send(json.dumps(message))
         print "output post experiment" #^^^
 
 
