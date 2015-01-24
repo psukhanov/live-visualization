@@ -11,7 +11,7 @@ import sys
 
 
 
-target_port = 'COM8'
+target_port = 'COM3'
 #target_port = 'devA/tty.XXXXXXX'  #change this to work on OSX
 
 try:

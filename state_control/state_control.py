@@ -89,10 +89,10 @@ class ChangeYourBrainStateControl( object ):
         
     def start_baseline_collection(self):
         self.experiment_state = BASELINE_COLLECTION
-         instruction = {"message": {
+        instruction = {"message": {
              "value" : {'instruction_name': 'BASELINE_COLLECTION', 'display_seconds': '30'},
              "type": "string", "name": "instruction", "clientName": self.client_name}}    
-         self.sb_server.ws.send(json.dumps(instruction))
+        self.sb_server.ws.send(json.dumps(instruction))
         print "start baseline collection" #^^^
 
         baseline_timer = Timer(self.baseline_seconds,self.start_post_baseline) #*** devNote: may want to send a countdown to visualization %%%
@@ -188,7 +188,7 @@ class ChangeYourBrainStateControl( object ):
         message = {"message": { 
              "value": value_out,
              "type": "string", "name": "instruction", "clientName": self.client_name}}
-         self.sb_server.ws.send(json.dumps(message))
+        self.sb_server.ws.send(json.dumps(message))
         print "output condition: {}".format(value_out) #^^^
 
     def output_baseline(self):
@@ -203,10 +203,10 @@ class ChangeYourBrainStateControl( object ):
         self.alpha_buffer = []
 
         value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
-         message = {"message": { #send synced EEG & ECG data here
+        message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
              "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
-         self.sb_server.ws.send(json.dumps(message))
+        self.sb_server.ws.send(json.dumps(message))
         print "output baseline: {}".format(value_out) #^^^
 
 
@@ -222,10 +222,10 @@ class ChangeYourBrainStateControl( object ):
         self.alpha_buffer = []
 
         value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
-         message = {"message": { #send synced EEG & ECG data here
+        message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
              "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
-         self.sb_server.ws.send(json.dumps(message))
+        self.sb_server.ws.send(json.dumps(message))
         print "output condition: {}".format(value_out) #^^^
 
     def output_post_experiment(self):
@@ -281,4 +281,21 @@ class KeyboardInputThread ( threading.Thread ):
     def run ( self ):
         while self.running:
             keyboard_input()
+
+# class WindowsGlobalKeyboardInput()
+# import pythoncom, pyHook
+
+# def OnKeyboardEvent(event):
+#     print 'Key:', event.Key
+#     print 'KeyID:', event.KeyID
+#     return True
+
+# # create a hook manager
+# hm = pyHook.HookManager()
+# # watch for all mouse events
+# hm.KeyDown = OnKeyboardEvent
+# # set the hook
+# hm.HookKeyboard()
+# # wait forever
+# pythoncom.PumpMessages()
 
