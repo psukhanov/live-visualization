@@ -65,8 +65,8 @@ span {
 
 #histogram {
   display: inline-block;
-  width: 960px;
-  height: 400px;
+  width: 500px;
+  height: 300px;
   margin: 5px auto;
 }
 
@@ -99,7 +99,7 @@ circle {
 }
 
 #bloom {
-  height: 350px;
+  height: 200px;
   margin: 0px auto;
 }
 
@@ -111,4 +111,8 @@ circle {
 .widget #instructions {
   font-size: 36px;
   line-height: 2.0;
+}
+
+.logo {
+  width: 400px;
 }

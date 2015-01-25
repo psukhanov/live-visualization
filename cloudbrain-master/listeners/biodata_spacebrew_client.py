@@ -17,6 +17,9 @@ from subprocess import call
 
 
 ECG_SIGNAL_IS_GOOD = 1
+eeg_source = "real" #fake or real
+ecg_source = "real" #fake or real
+
 biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
 #biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
@@ -26,7 +29,7 @@ class SpacebrewClient(object):
         self.server = server
         self.port = port
         self.timestamp = 0
-        self.client_name = 'booth-5'
+        self.client_name = 'booth-7'
 
         # configure the spacebrew client
         self.brew = SpacebrewApp(name, server=server)
@@ -141,7 +144,7 @@ class SpacebrewServer(object):
         elif (port==9002):
             config = {
                     'config': {
-                        'name': 'booth-5',
+                        'name': 'booth-7',
                         'publish': {
                             'messages': [{'name': 'eeg_ecg', 'type' : 'string'},{'name' : 'instruction', 'type' : 'string'}]
                      }
@@ -214,7 +217,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     '--name',
     help='Your name or ID without spaces or special characters',
-    default='5') #biodata is booth-5
+    default='7') #biodata is booth-7
 
 if __name__ == "__main__":
 
@@ -222,14 +225,15 @@ if __name__ == "__main__":
     sb_server = SpacebrewServer(muse_ids=['fake-muse'], server='127.0.0.1') #simulating data coming in from our user's muse
 
     serverThread = ServerThread()
-    serverThread.start()
+    #serverThread.start()
 
     global sb_server_2 # used for sending out instructions & processed EEG/ECG to the viz
-    sb_server_2 = SpacebrewServer(server='127.0.0.1',port=9002,muse_ids=['booth-5'])
+    sb_server_2 = SpacebrewServer(server='127.0.0.1',port=9002,muse_ids=['booth-7'])
 
     global sb_client
     args = parser.parse_args()
-    sb_client = SpacebrewClient('booth-%s' % args.name, '127.0.0.1') #in production, this will be set to server.neuron.brain
+    serverName = 'server.neuron.brain'
+    sb_client = SpacebrewClient('booth-%s' % args.name, serverName) #in production, this will be set to server.neuron.brain
     #sb_client.start()
     listenerThread = ListenerThread()
     listenerThread.start()

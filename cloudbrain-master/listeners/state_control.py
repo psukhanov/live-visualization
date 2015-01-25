@@ -159,6 +159,9 @@ class ChangeYourBrainStateControl( object ):
         time.sleep(1)
         self.output_instruction('Q3')
         time.sleep(1)
+        self.output_instruction('Q4')
+        time.sleep(1)
+        
         ###*** how to collect this keyboard input if window focus is not on console!??? 
         self.start_post_experiment()
 
@@ -172,22 +175,24 @@ class ChangeYourBrainStateControl( object ):
 
     def output_instruction(self,sub_state=None):
         if self.experiment_state == SETUP_INSTRUCTIONS:
-            instruction_text = 'SETUP_INSTRUCTIONS'
+            instruction_text = 'This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin'
         elif self.experiment_state == BASELINE_INSTRUCTIONS:
-            instruction_text = 'BASELINE_INSTRUCTIONS'
+            instruction_text = 'Give us 30 seconds to calibrate to your brain and body. Please stay still and silent.'
         elif self.experiment_state == CONDITION_INSTRUCTIONS:
-            instruction_text = 'CONDITION_INSTRUCTIONS'
+            instruction_text = 'In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.'
         elif self.experiment_state in [CONDITION_CONFIRMATION,BASELINE_CONFIRMATION]:
             if sub_state == "CONFIRMATION" and self.experiment_state == BASELINE_CONFIRMATION:
                 instruction_text = "BASELINE_CONFIRMATION"
             elif sub_state == "CONFIRMATION" and self.experiment_state == CONDITION_CONFIRMATION:
                 instruction_text = "CONDITION_CONFIRMATION"
             elif sub_state == "Q1":
-                instruction_text = "Q1"
+                instruction_text = "Did you complete the exercises correctly? Type \'1\' for yes and \'0\' for no."
             elif sub_state == "Q2":
-                instruction_text = "Q2"
+                instruction_text = "How calm do you feel? type a number between 1 (not at all) and 9 (very)"
             elif sub_state == "Q3":
-                instruction_text = 'Q3'
+                instruction_text = 'How content are you? (1-9)'
+            elif sub_state == "Q4":
+                instruction_text = 'How distracted are you? (1-9)' 
             else:
                 raise Exception ('Unkown sub_state for instruction sent in state ' + str(self.experiment_state))
         else:
