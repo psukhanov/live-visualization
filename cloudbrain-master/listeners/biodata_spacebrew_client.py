@@ -20,7 +20,6 @@ import serial
 
 
 ECG_SIGNAL_IS_GOOD = 1
-<<<<<<< HEAD
 eeg_source = "real" #fake or real
 ecg_source = "real" #fake or real
 
