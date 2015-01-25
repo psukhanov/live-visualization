@@ -99,8 +99,8 @@ circle {
 }
 
 #bloom {
-  height: 200px;
-  margin: 0px auto;
+  height: 325px;
+  margin: 15px auto;
 }
 
 
@@ -156,4 +156,14 @@ circle {
 
 .radar-chart .axis .legend {
   font-size: 20px;
+}
+
+#eeg_legend_baseline, #ecg_legend_baseline, #eeg_legend_condition, #ecg_legend_condition {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+}
+
+text .middle {
+  margin: 15px;
 }

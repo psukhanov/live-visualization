@@ -1,8 +1,8 @@
 var margin = {
-    top: 40,
-    right: 40,
-    bottom: 40,
-    left: 120
+    // top: 40,
+    // right: 40,
+    // bottom: 40,
+    // left: 120
 },
     // width = 960 - margin.left - margin.right,
     width = 280,
@@ -36,7 +36,7 @@ function pulse() {
             .transition()
             .duration(4500)
             .attr('stroke-width', 0.5)
-            .attr("r", 150)
+            .attr("r", 125)
             .ease('sine')
             .each("end", repeat);
     })();

@@ -61,7 +61,7 @@
                             <div class="histogram">
                                 <div id="eeg_graph_baseline"></div>
                                 <div id="eeg_legend_baseline"></div>
-                                <br><br>
+                                <!-- <br><br> -->
                                  <div id="eeg_state_baseline">Trying to connect</div>
                             </div>
                         </section>
@@ -72,7 +72,7 @@
                             <div class="histogram">
                                 <div id="ecg_graph_baseline"></div>
                                 <div id="ecg_legend_baseline"></div>
-                                <br><br>
+                                <!-- <br><br> -->
                                  <div id="ecg_state_baseline">Trying to connect</div>
                             </div>
                         </section>
@@ -94,7 +94,7 @@
                 </div>
 
                 <div class="row section" id="section">
-                    <div class="col-lg-5">
+                    <div class="col-lg-8">
                         <section class="widget">
                             <header>
                                 <h4>Baseline vs Actual</h4>
@@ -102,7 +102,7 @@
                             <div class="histogram">
                                 <div id="eeg_graph_condition"></div>
                                 <div id="eeg_legend_condition"></div>
-                                </br></br>
+                                <!-- </br></br> -->
                                 <div id="eeg_state_condition">Trying to connect</div>
                             </div>
                         </section>
@@ -115,12 +115,12 @@
                             <div class="histogram">
                                 <div id="ecg_graph_condition"></div>
                                 <div id="ecg_legend_condition"></div>
-                                </br></br>
+                                <!-- </br></br> -->
                                 <div id="ecg_state_condition">Trying to connect</div>
                             </div>
                         </section>
                     </div>
-                    <div class="col-lg-5">
+                    <div class="col-lg-4">
                         <section class="widget">
                             <header>
                                 <h4>Breath
@@ -197,8 +197,9 @@
             // Spacebrew Object
             //set up graph & axes in Rickshaw
 
-            var graph_height = 300;
-            var graph_width = 500;
+            var graph_height = 250;
+            // var graph_width = 500;
+            var graph_width = 620;
 
             var eeg_graph_baseline = new Rickshaw.Graph( {
                 element: document.querySelector("#eeg_graph_baseline"),

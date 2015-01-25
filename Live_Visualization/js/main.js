@@ -54,7 +54,7 @@ window.onload = function(){
     window.myBar = new Chart(ctx).Bar(barChartData, {
         responsive : true,
         // scaleShowGridLines : false,
-        scaleFontSize: 30,
+        scaleFontSize: 32,
         scaleFontColor: "#FFF",
         scaleFontFamily: "'Open Sans',sans-serif;",
         scaleLineColor: "#FFF",
