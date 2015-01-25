@@ -38,10 +38,11 @@ var barChartData = {
             data : [randomScalingFactor(),randomScalingFactor()]
         },
         {
-            fillColor : "rgba(151,187,205,0.5)",
-            strokeColor : "rgba(151,187,205,0.8)",
-            highlightFill : "rgba(151,187,205,0.75)",
-            highlightStroke : "rgba(151,187,205,1)",
+            fillColor : "rgb(234, 200, 94)",
+            strokeColor : "rgb(234, 200, 98)",
+            highlightFill : "#eac85e",
+            highlightStroke : "#eac85e",
+            // highlightStroke : "rgba(151,187,205,1)",
             data : [randomScalingFactor(),randomScalingFactor()]
         }
     ]
@@ -59,3 +60,69 @@ window.onload = function(){
         scaleLineColor: "#FFF",
     });
 }
+
+// Radar Chart
+RadarChart.defaultConfig.color = function() {};
+RadarChart.defaultConfig.radius = 3;
+
+var data = [
+  {
+    className: 'germany', // optional can be used for styling
+    axes: [
+      {axis: "strength", value: 13},
+      {axis: "intelligence", value: 6},
+      {axis: "charisma", value: 5},
+      {axis: "dexterity", value: 9},
+      {axis: "luck", value: 2}
+    ]
+  },
+  {
+    className: 'argentina',
+    axes: [
+      {axis: "strength", value: 6},
+      {axis: "intelligence", value: 7},
+      {axis: "charisma", value: 10},
+      {axis: "dexterity", value: 13},
+      {axis: "luck", value: 9}
+    ]
+  }
+];
+
+function randomDataset() {
+  return data.map(function(d) {
+    return {
+      className: d.className,
+      axes: d.axes.map(function(axis) {
+        return {axis: axis.axis, value: Math.ceil(Math.random() * 10)};
+      })
+    };
+  });
+}
+
+var chart = RadarChart.chart();
+var cfg = chart.config(); // retrieve default config
+var svg = d3.select('body').append('svg')
+.attr('width', cfg.w)
+.attr('height', cfg.h + cfg.h / 4);
+svg.append('g').classed('single', 1).datum(randomDataset()).call(chart);
+
+function render() {
+    var game = svg.selectAll('g.game').data(
+      [
+        randomDataset(),
+        randomDataset(),
+        randomDataset(),
+        randomDataset()
+      ]
+    );
+    game.enter().append('g').classed('game', 1);
+    game
+      .attr('transform', function(d, i) { return 'translate('+(i * cfg.w)+','+ (cfg.h * 4) +')'; })
+      .call(chart);
+
+    setTimeout(render, 1000);
+}
+render();
+
+RadarChart.defaultConfig.levelTick = true;
+RadarChart.draw(".chart-container", data);
