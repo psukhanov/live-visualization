@@ -105,7 +105,7 @@ circle {
 
 
 #countdown {
-  margin-left: 20%;
+  margin-left: 35px;
 }
 
 .widget #instructions {
@@ -152,4 +152,8 @@ circle {
 
 .widget>header h4 {
   font-size: 28px;
+}
+
+.radar-chart .axis .legend {
+  font-size: 20px;
 }
