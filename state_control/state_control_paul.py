@@ -214,6 +214,9 @@ class ChangeYourBrainStateControl( object ):
             alpha_out = 1
         self.alpha_buffer = []
 
+        print "hrv type:",type(self.ecg.get_hrv())
+        print "hrv:",self.ecg.get_hrv()
+        
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,

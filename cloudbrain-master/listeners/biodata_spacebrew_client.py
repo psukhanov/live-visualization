@@ -20,12 +20,11 @@ import serial
 
 
 ECG_SIGNAL_IS_GOOD = 1
-<<<<<<< HEAD
 eeg_source = "real" #fake or real
 ecg_source = "real" #fake or real
 
-biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
-#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
+#biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
+biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
 class SpacebrewClient(object):
     def __init__(self, name, server='127.0.0.1', port=9000): 

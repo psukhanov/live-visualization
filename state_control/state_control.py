@@ -132,13 +132,22 @@ class ChangeYourBrainStateControl( object ):
 
     def start_condition_collection(self):
         self.experiment_state = CONDITION_COLLECTION
+        ### make sure to change this to average from start of baseline collection
+        self.baseline_alpha = sum(self.alpha_save_baseline['value']) / len(self.alpha_save_baseline['value'])
+        self.baseline_hrv = sum(self.hrv_save_baseline['value']) / len(self.hrv_save_baseline['value'])
 
         #tell viz to go to the condition screen 
         instruction = {"message": {
-             "value" : {'instruction_name': 'CONDITION_COLLECTION', 'display_seconds': self.condition_seconds},
+             "value" : {'instruction_name': 'CONDITION_COLLECTION',
+                         'display_seconds': self.condition_seconds,
+                         'baseline_alpha' : self.baseline_alpha,
+                         'baseline_hrv' : self.baseline_hrv},
              "type": "string", "name": "instruction", "clientName": self.client_name}}    
         self.sb_server.ws.send(json.dumps(instruction))
         print "start condition collection" #^^^
+        print 'display_seconds:', self.condition_seconds
+        print 'baseline_alpha',self.baseline_alpha
+        print 'baseline_hrv', self.baseline_hrv
 
         condition_timer = Timer(self.condition_seconds,self.start_post_condition) #*** devNote: may want to send a countdown to visualization %%%
         condition_timer.start()
@@ -209,8 +218,10 @@ class ChangeYourBrainStateControl( object ):
             alpha_out = 1
         self.alpha_buffer = []
 
-        print "hrv type:",type(self.ecg.get_hrv())
-        print "hrv:",self.ecg.get_hrv()
+        # print "hrv type:",type(self.ecg.get_hrv())
+        # print "hrv:",self.ecg.get_hrv()
+        self.alpha_save_baseline['time'].append(time.time())
+        self.alpha_save_baseline['value'].append(self.ecg.get_hrv())
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
@@ -238,11 +249,6 @@ class ChangeYourBrainStateControl( object ):
         print "output condition: {}".format(value_out) #^^^
 
     def output_post_experiment(self):
-
-        if (len(self.alpha_save_baseline['value']) > 0):
-            baseline_alpha = sum(self.alpha_save_baseline['value'])/len(self.alpha_save_baseline['value'])
-        else:
-            baseline_alpha = 0
 
         if (len(self.alpha_save['value']) > 0):
             condition_alpha = sum(self.alpha_save['value'])/len(self.alpha_save['value'])
