@@ -53,13 +53,15 @@ window.onload = function(){
     var ctx = document.getElementById("canvas").getContext("2d");
     window.myBar = new Chart(ctx).Bar(barChartData, {
         responsive : true,
-        scaleShowGridLines : false,
-        scaleFontSize: 24,
+        // scaleShowGridLines : false,
+        scaleFontSize: 30,
         scaleFontColor: "#FFF",
         scaleFontFamily: "'Open Sans',sans-serif;",
         scaleLineColor: "#FFF",
     });
 }
+
+
 
 // Radar Chart
 RadarChart.defaultConfig.color = function() {};

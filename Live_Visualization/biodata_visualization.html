@@ -52,7 +52,8 @@
                 </div>
 
                 <div class="row section" id="section">
-                    <div class="col-lg-5">
+
+                    <div class="col-lg-8">
                         <section class="widget">
                             <header>
                                 <h4>EEG Baseline Collection</h4>
@@ -76,10 +77,12 @@
                             </div>
                         </section>
                     </div>
-                    <div class="col-lg-5">
+
+                    <div class="col-lg-4">
                         <section class="widget">
                             <header>
-                                <h4>More Information &nbsp;<span class="label label-danger">Instructions</span></h4>
+                                <h4>More Information &nbsp;
+                                    <!-- <span class="label label-danger">Instructions</span></h4> -->
                             </header>
                             <div class="widget-body">
                             <!-- <div id="msg-content"></div> -->
@@ -462,7 +465,7 @@ function start_baseline_timer(seconds)
 {
     console.log("start baseline timer called with " + seconds + " seconds");
                 var countdown = $("#countdown").countdown360({
-                 radius: 115,
+                 radius: 95,
                  seconds: seconds,
                  label: ['sec', 'secs'],
                 fontColor: '#FFFFFF',
@@ -536,6 +539,8 @@ function makeAverageBaseline(value, buffer) {
   }
   return arr;
 }
+
+// start_baseline_timer()
 
 </script>
 <!--<script type="text/javascript" src="js/countdown.js"></script>-->
