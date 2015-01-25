@@ -47,7 +47,9 @@ class ChangeYourBrainStateControl( object ):
 
     ### CALLED VIA SPACEBREW CLIENT LISTENER ############
     def process_eeg_alpha(self,value):
-        self.alpha_buffer.append(value)
+        arrValue = value.split(',')
+        self.alpha_buffer.append(arrValue)
+        #print('process_eeg_alpha called')
         ### make sure buffer gets clear when no subjects
         ### log data
         
@@ -73,6 +75,9 @@ class ChangeYourBrainStateControl( object ):
         self.alpha_save = {'time': [], 'value':[]}
         self.hrv_save = {'time': [], 'value': []}
 
+        self.alpha_save_baseline = {'time': [], 'value':[]}
+        self.hrv_save_baseline = {'time': [], 'value':[]}
+
     ######################################################
     ### STATE CHANGING ############
     def start_setup_instructions(self):
@@ -89,8 +94,10 @@ class ChangeYourBrainStateControl( object ):
         
     def start_baseline_collection(self):
         self.experiment_state = BASELINE_COLLECTION
+
+        #tell viz to go to the baseline screen 
         instruction = {"message": {
-             "value" : {'instruction_name': 'BASELINE_COLLECTION', 'display_seconds': '30'},
+             "value" : {'instruction_name': 'BASELINE_COLLECTION', 'display_seconds': self.baseline_seconds},
              "type": "string", "name": "instruction", "clientName": self.client_name}}    
         self.sb_server.ws.send(json.dumps(instruction))
         print "start baseline collection" #^^^
@@ -98,7 +105,7 @@ class ChangeYourBrainStateControl( object ):
         baseline_timer = Timer(self.baseline_seconds,self.start_post_baseline) #*** devNote: may want to send a countdown to visualization %%%
         baseline_timer.start()
         #self.output_go_to_baseline()
-        #self.do_every_while(self.vis_period,BASELINE_COLLECTION,self.output_baseline) # instruct vis to start plotting 
+        self.do_every_while(self.vis_period,BASELINE_COLLECTION,self.output_baseline) # instruct vis to start plotting 
 
     def start_post_baseline(self):
         """ask for confirmation + subjective feedback + selection of condition"""
@@ -125,6 +132,14 @@ class ChangeYourBrainStateControl( object ):
 
     def start_condition_collection(self):
         self.experiment_state = CONDITION_COLLECTION
+
+        #tell viz to go to the condition screen 
+        instruction = {"message": {
+             "value" : {'instruction_name': 'CONDITION_COLLECTION', 'display_seconds': self.condition_seconds},
+             "type": "string", "name": "instruction", "clientName": self.client_name}}    
+        self.sb_server.ws.send(json.dumps(instruction))
+        print "start condition collection" #^^^
+
         condition_timer = Timer(self.condition_seconds,self.start_post_condition) #*** devNote: may want to send a countdown to visualization %%%
         condition_timer.start()
         ### ??? send instructor
@@ -183,26 +198,20 @@ class ChangeYourBrainStateControl( object ):
             "type": "string", "name": "instruction", "clientName": self.client_name}}    
         self.sb_server.ws.send(json.dumps(instruction))
 
-    def output_go_to_baseline(self):
-        value_out = {"instruction_name":"BASELINE_COLLECTION","display_seconds":self.baseline_seconds}
-        message = {"message": { 
-             "value": value_out,
-             "type": "string", "name": "instruction", "clientName": self.client_name}}
-        self.sb_server.ws.send(json.dumps(message))
-        print "output condition: {}".format(value_out) #^^^
-
     def output_baseline(self):
         """output aggregated EEG and HRV values"""
         #devNote: possibly switch to outputting raw ECG instead of HRV during baseline
         if self.alpha_buffer:
-            alpha_out = mean(self.alpha_buffer)
-            self.alpha_save['time'].append(time.time())
-            self.alpha_save['value'].append(alpha_out)
+            alpha_out = (float(self.alpha_buffer[0][1])+float(self.alpha_buffer[0][2]))/2
+            self.alpha_save_baseline['time'].append(time.time())
+            self.alpha_save_baseline['value'].append(alpha_out)
         else: 
-            alpha_out = 0
+            alpha_out = 1
         self.alpha_buffer = []
 
-        value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
+        print "hrv type:",type(self.ecg.get_hrv())
+        print "hrv:",self.ecg.get_hrv()
+        value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
              "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
@@ -214,14 +223,14 @@ class ChangeYourBrainStateControl( object ):
         """output aggregated EEG and HRV values"""
         # note: currently the same as output_baseline
         if self.alpha_buffer:
-            alpha_out = mean(self.alpha_buffer)
+            alpha_out = (float(self.alpha_buffer[0][1])+float(self.alpha_buffer[0][2]))/2
             self.alpha_save['time'].append(time.time())
             self.alpha_save['value'].append(alpha_out)
         else: 
-            alpha_out = 0
+            alpha_out = 1
         self.alpha_buffer = []
 
-        value_out = "{:.2f},{:.2f},{:.1f}".format(alpha_out,self.ecg.get_hrv(),time.time()-self.tag_time)
+        value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
              "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
@@ -229,6 +238,25 @@ class ChangeYourBrainStateControl( object ):
         print "output condition: {}".format(value_out) #^^^
 
     def output_post_experiment(self):
+
+        if (len(self.alpha_save_baseline['value']) > 0):
+            baseline_alpha = sum(self.alpha_save_baseline['value'])/len(self.alpha_save_baseline['value'])
+        else:
+            baseline_alpha = 0
+
+        if (len(self.alpha_save['value']) > 0):
+            condition_alpha = sum(self.alpha_save['value'])/len(self.alpha_save['value'])
+        else:
+            condition_alpha = 0
+
+        baseline_hrv = 1
+        condition_hrv = 1.5
+
+        value_out = {"instruction_name":"POST_EXPERIMENT","baseline_hrv":baseline_hrv,"baseline_alpha":baseline_alpha,"condition_alpha":condition_alpha,"condition_hrv":condition_hrv}
+        message = {"message": { 
+             "value": value_out,
+             "type": "string", "name": "instruction", "clientName": self.client_name}}
+        self.sb_server.ws.send(json.dumps(message))
         print "output post experiment" #^^^
 
 
@@ -281,21 +309,4 @@ class KeyboardInputThread ( threading.Thread ):
     def run ( self ):
         while self.running:
             keyboard_input()
-
-# class WindowsGlobalKeyboardInput()
-# import pythoncom, pyHook
-
-# def OnKeyboardEvent(event):
-#     print 'Key:', event.Key
-#     print 'KeyID:', event.KeyID
-#     return True
-
-# # create a hook manager
-# hm = pyHook.HookManager()
-# # watch for all mouse events
-# hm.KeyDown = OnKeyboardEvent
-# # set the hook
-# hm.HookKeyboard()
-# # wait forever
-# pythoncom.PumpMessages()
 

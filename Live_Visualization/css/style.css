@@ -113,6 +113,43 @@ circle {
   line-height: 2.0;
 }
 
-.logo {
-  width: 400px;
+.connection {
+  margin: 15px 15px auto;
+  font-size: 20px;
+}
+
+.radar-chart .area {
+  fill-opacity: 0.7;
+}
+.radar-chart.focus .area {
+  fill-opacity: 0.3;
+}
+.radar-chart.focus .area.focused {
+  fill-opacity: 0.9;
+}
+.area.before, .before .circle {
+  fill: #FFD700;
+  stroke: none;
+}
+.area.after, .after .circle {
+  fill: #ADD8E6;
+  stroke: none;
+}
+
+.chart-container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.box .description {
+  font-size: 22px;
+}
+
+.logo h2 >a {
+  font-size: 40px;
+}
+
+.widget>header h4 {
+  font-size: 28px;
 }

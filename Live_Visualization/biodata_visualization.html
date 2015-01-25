@@ -5,14 +5,15 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
-        <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="css/jquery.fullPage.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="css/radar-chart.css" type="text/css" media="screen" charset="utf-8" />
+        <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
         <script type="text/javascript" src="js/jq.js"></script>
         <script type="text/javascript" src="js/sb-1.4.1.js"></script>
         <script type="text/javascript" src="../rickshaw-master/vendor/d3.min.js"></script>
         <script type="text/javascript" src="../rickshaw-master/rickshaw.min.js"></script>
-        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-        <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
         <script type="text/javascript" src="js/jquery.countdown360.js"></script>
 
         <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
@@ -25,6 +26,16 @@
                     <div class="logo pull-left">
                         <h2><a href="index.html">Change Your Mind</strong></a> <small>0.1</small></h2>
                     </div>
+                    <ul class="nav navbar-nav navbar-right pull-right">
+                        <li class="connection">
+                            <i class="fa fa-circle text-success"></i>
+                            <span class="label-name" id="connected">EEG Connected</span>
+                        </li>
+                        <li class="connection">
+                            <i class="fa fa-circle text-danger"></i>
+                            <span class="label-name" id="not-connected">EEG Not Connected</span>
+                        </li>
+                    </ul>
                 </div>
             </header>
 
@@ -95,7 +106,7 @@
                         <section class="widget">
                             <header>
                                 <h4>ECG Readings
-                                    <small>Real-time Plot</small>
+                                    <!-- <small>Real-time Plot</small> -->
                                 </h4>
                             </header>
                             <div class="histogram">
@@ -110,7 +121,7 @@
                         <section class="widget">
                             <header>
                                 <h4>Breath
-                                    <small>breathing visualization</small>
+                                    <!-- <small>breathing visualization</small> -->
                                 </h4>
                             </header>
                             <div id="bloom"></div>
@@ -119,19 +130,45 @@
                 </div>
 
                 <div class="row section" id="section">
-                    <div class="col-lg-12">
+                <!-- <div class="row section" id="section"> -->
+                    <div class="col-lg-8">
                         <section class="widget">
-                            <header>
-                                <h4>Results Page</h4>
-                            </header>
-                            <div id="barchart1">pass</div>
+                            <div id="barchart1">
+                                <div style="width: 100%">
+                                    <canvas id="canvas" height="250" width="600"></canvas>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="widget">
+                            <div class="chart-container">
+                                <div id="radar-chart"></div>
+                            </div>
                         </section>
                     </div>
+                    <div class="col-md-4">
+                        <div class="box">
+                            <div class="big-text">
+                                33% increase
+                            </div>
+                            <div class="description">
+                                Heart Rate Variability
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="big-text">
+                                55% decrease
+                            </div>
+                            <div class="description">
+                                EEG Alpha
+                            </div>
+                        </div>
+                    </div>
+                <!-- </div> -->
                 </div>
             </div>
 
         </div>
-        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script type="text/javascript" src="js/d3.v3.min.js"></script>
         <script type="text/javascript" src="js/bloom.js"></script>
         <script type="text/javascript">
             // variables to change
@@ -489,7 +526,7 @@ function make_axes()
     var yAxis_ecg_cond = new Rickshaw.Graph.Axis.Y({
                 graph: ecg_graph_condition
                 });
-    yAxis_ecg_cond.render();    
+    yAxis_ecg_cond.render();
 }
 
 function makeAverageBaseline(value, buffer) {
@@ -502,7 +539,9 @@ function makeAverageBaseline(value, buffer) {
 
 </script>
 <!--<script type="text/javascript" src="js/countdown.js"></script>-->
+<script type="text/javascript" src="js/Chart.js"></script>
 <script type="text/javascript" src="js/jquery.fullPage.js"></script>
+<script type="text/javascript" src="js/radar-chart.js"></script>
 <script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

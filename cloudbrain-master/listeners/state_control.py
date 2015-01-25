@@ -161,7 +161,7 @@ class ChangeYourBrainStateControl( object ):
         time.sleep(1)
         self.output_instruction('Q4')
         time.sleep(1)
-        
+
         ###*** how to collect this keyboard input if window focus is not on console!??? 
         self.start_post_experiment()
 
