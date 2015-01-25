@@ -65,25 +65,24 @@ window.onload = function(){
 RadarChart.defaultConfig.color = function() {};
 RadarChart.defaultConfig.radius = 3;
 
+// TODO: Lincoln - radar data
 var data = [
   {
-    className: 'germany', // optional can be used for styling
+    className: 'before', // optional can be used for styling
     axes: [
-      {axis: "strength", value: 13},
-      {axis: "intelligence", value: 6},
-      {axis: "charisma", value: 5},
-      {axis: "dexterity", value: 9},
-      {axis: "luck", value: 2}
+      {axis: "calm", value: 13},
+      {axis: "contentedness", value: 6},
+      {axis: "distraction", value: 5},
+      {axis: "well-being", value: 9},
     ]
   },
   {
-    className: 'argentina',
+    className: 'after',
     axes: [
-      {axis: "strength", value: 6},
-      {axis: "intelligence", value: 7},
-      {axis: "charisma", value: 10},
-      {axis: "dexterity", value: 13},
-      {axis: "luck", value: 9}
+      {axis: "calm", value: 6},
+      {axis: "contentedness", value: 7},
+      {axis: "distraction", value: 10},
+      {axis: "well-being", value: 13},
     ]
   }
 ];
