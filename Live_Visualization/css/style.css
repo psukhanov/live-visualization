@@ -112,3 +112,8 @@ circle {
   font-size: 36px;
   line-height: 2.0;
 }
+
+.connection {
+  margin: 15px 15px auto;
+  font-size: 20px;
+}
