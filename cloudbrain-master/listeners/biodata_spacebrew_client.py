@@ -68,8 +68,10 @@ class SpacebrewClient(object):
             {'address': "/muse/elements/experimental/mellow", 'arguments': 1}
         ]
 
+        print 'about to connect to %s' % self.server
         self.ws = create_connection("ws://%s:%s" % (self.server, self.port))
 
+        print 'connected to server'
         for path in self.osc_paths:
             spacebrew_name = path['address'].split('/')[-1]
             #self.brew.add_subscriber(spacebrew_name, "string")
@@ -304,6 +306,8 @@ if __name__ == "__main__":
     global sb_server_2 # used for sending out instructions & processed EEG/ECG to the viz
     sb_server_2 = SpacebrewServer(server='127.0.0.1',port=9002,muse_ids=['booth-7'])
 
+    print 'hello world 1'
+
     global sb_client
     args = parser.parse_args()
     serverName = 'server.neuron.brain'
@@ -312,16 +316,19 @@ if __name__ == "__main__":
     listenerThread = ListenerThread()
     listenerThread.start()
 
-    # ecg = ecg_fake()
-    ecg = ecg_real()
-    t1 = threading.Thread(target=ecg.start)  
-    t1.daemon = False
-    t1.start()
+    print 'hello world 2'
+
+    ecg = ecg_fake()
+    #ecg = ecg_real()
+    # t1 = threading.Thread(target=ecg.start)  
+    # t1.daemon = False
+    # t1.start()
 
     #file_dir = os.path.dirname(os.path.realpath(__file__))
 
     #hard-coding is bad! Somebody who knows python please find this file the right way 
 
+    print 'hello world 3'
 
 
     if sys.platform == 'win32': #windoze
@@ -331,13 +338,15 @@ if __name__ == "__main__":
     else: # Linux
         chrome_path = '/usr/bin/google-chrome %s'
 
+    print 'hello world 4'
 
     #webbrowser.get(chrome_path).open(biodata_viz_url)    
     webbrowser.open(biodata_viz_url)    
     time.sleep(4)
 
-    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 10, condition_sec = 10, baseline_inst_sec = 2, condition_inst_sec = 2)
+    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 10, condition_sec = 10, baseline_inst_sec = 5, condition_inst_sec = 8)
+    print 'hello world 5'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
+    print 'attempting to tag in'
     sc.tag_in()
     
-
