@@ -29,11 +29,11 @@
                     <ul class="nav navbar-nav navbar-right pull-right">
                         <li class="connection">
                             <i class="fa fa-circle text-success"></i>
-                            <span class="label-name" id="connected">EEG Connected</span>
+                            <span class="label-name" id="eeg_state">EEG: Connected</span>
                         </li>
                         <li class="connection">
                             <i class="fa fa-circle text-danger"></i>
-                            <span class="label-name" id="not-connected">EEG Not Connected</span>
+                            <span class="label-name" id="ecg_state">ECG: Not Connected</span>
                         </li>
                     </ul>
                 </div>
@@ -62,7 +62,6 @@
                                 <div id="eeg_graph_baseline"></div>
                                 <div id="eeg_legend_baseline"></div>
                                 <!-- <br><br> -->
-                                 <div id="eeg_state_baseline">Trying to connect</div>
                             </div>
                         </section>
                         <section class="widget">
@@ -73,7 +72,6 @@
                                 <div id="ecg_graph_baseline"></div>
                                 <div id="ecg_legend_baseline"></div>
                                 <!-- <br><br> -->
-                                 <div id="ecg_state_baseline">Trying to connect</div>
                             </div>
                         </section>
                     </div>
@@ -103,7 +101,6 @@
                                 <div id="eeg_graph_condition"></div>
                                 <div id="eeg_legend_condition"></div>
                                 <!-- </br></br> -->
-                                <div id="eeg_state_condition">Trying to connect</div>
                             </div>
                         </section>
                         <section class="widget">
@@ -116,7 +113,6 @@
                                 <div id="ecg_graph_condition"></div>
                                 <div id="ecg_legend_condition"></div>
                                 <!-- </br></br> -->
-                                <div id="ecg_state_condition">Trying to connect</div>
                             </div>
                         </section>
                     </div>
@@ -150,7 +146,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="box">
-                            <div class="big-text">
+                            <div class="big-text" id="hrv_change">
                                 33% increase
                             </div>
                             <div class="description">
@@ -158,7 +154,7 @@
                             </div>
                         </div>
                         <div class="box">
-                            <div class="big-text">
+                            <div class="big-text" id="alpha_change">
                                 55% decrease
                             </div>
                             <div class="description">
@@ -173,6 +169,7 @@
         </div>
         <script type="text/javascript" src="js/d3.v3.min.js"></script>
         <script type="text/javascript" src="js/bloom.js"></script>
+
         <script type="text/javascript">
             // variables to change
             var bufferLength = 120;
@@ -205,6 +202,8 @@
                 element: document.querySelector("#eeg_graph_baseline"),
                 width: graph_width,
                 height: graph_height,
+                min: -1,
+                max: 1,
                 renderer: 'line',
                 series: [{
                     color: 'steelblue',
@@ -218,18 +217,21 @@
                 width: graph_width,
                 height: graph_height,
                 renderer: 'line',
+
                 series: [{
                     color: "rgb(207, 109, 81)",
                     data: [],
                     name: "ECG"
                 }]
             });
-
+            // a = [{x: 1, y: 2}, {x: 12, y: 13}];
             var eeg_graph_condition = new Rickshaw.Graph( {
                 element: document.querySelector("#eeg_graph_condition"),
                 width: graph_width,
                 height: graph_height,
                 renderer: 'line',
+                min: -1,
+                max: 1,
                 series: [{
                     color: 'steelblue',
                      data: [],
@@ -274,7 +276,7 @@
                 element: document.querySelector('#eeg_legend_condition')
             });
             var legend_4 = new Rickshaw.Graph.Legend({
-                graph: eeg_graph_baseline,
+                graph: ecg_graph_condition,
                 element: document.querySelector('#ecg_legend_condition')
             });
 
@@ -302,34 +304,31 @@ function setup (){
     // connect to spacbrew
     sb.connect();
 
-    //remove this later
-    $(document).keypress(event,function(){
-        console.log(event);
-        console.log("key was presssed");
-        var character = event.charCode;
-        if (character == "49")
-        {
- 	      $("#instructions").html("testing");
- 	      $(document).trigger('goTo',1);
-        }
-    });
+
+       /* d3.select('#eeg_graph_condition svg')
+        .append('line')
+        .attr({
+            x1: 0,// eeg_graph_to_plot.xAxis.scale()(0),
+            y1: 50,// eeg_graph_to_plot.yAxis.scale()(10),
+            x2: 100,//eeg_graph_to_plot.xAxis.scale()(100),
+            y2: 50//eeg_graph_to_plot.yAxis.scale()(10)
+        })
+        .style("stroke", "#000");
+        console.log("eeg graph condition" + eeg_graph_condition);*/
 }
 /**
 * Function that is called when Spacebrew connection is established
 */
 function onOpen() {
     console.log("spacebrew client connection opened")
-    $("#eeg_state_baseline").html( eeg_connected_text );
-    $("#eeg_state_condition").html( eeg_connected_text );
+    $("#eeg_state").html( eeg_connected_text );
 }
 
 function onClose() {
     var message = "Trying to connect";
-    $("#eeg_state_baseline").html( eeg_disconnected_text );
-    $("#ecg_state_baseline").html( ecg_disconnected_text );
-    $("#eeg_state_condition").html( eeg_disconnected_text );
-    $("#ecg_state_condition").html( ecg_disconnected_text );
-    $("#message").html( message );
+    $("#eeg_state").html( eeg_disconnected_text );
+    $("#ecg_state").html( ecg_disconnected_text );
+    //$("#message").html( message );
 }
 /**
 * onStringMessage Function that is called whenever new spacebrew string messages are received.
@@ -414,15 +413,26 @@ function update_ui(instruction)
        var hrv_avg_baseline =  0.3;
 
         eeg_graph_to_plot = eeg_graph_condition;
-        //d3.select("body").append("svg")
+
+        //d3.select("eeg_graph_condition").enter().append("svg")
         //.attr("class", "axis")
         //.attr("width", eeg_graph_to_plot.width)
         //.attr("height", 30)
-        //d3.enter();
-        //var baseline_series = makeAverageBaseline(alpha_avg_baseline,eeg_graph_condition.series[0].data)
+
+        d3.select('#eeg_graph_condition').append('svg_2')
+        .append('line')
+        .attr({
+            x1: 0,// eeg_graph_to_plot.xAxis.scale()(0),
+            y1: 20,// eeg_graph_to_plot.yAxis.scale()(10),
+            x2: graph_width,//eeg_graph_to_plot.xAxis.scale()(100),
+            y2: 20//eeg_graph_to_plot.yAxis.scale()(10)
+        })
+        .style("stroke", "#000");
+        console.log(eeg_graph_condition);
+        //var baseline_series = makeAverageBaseline(alpha_avg_baseline,eeg_graph_baseline.series[0].data);
         //eeg_graph_condition.series[1].data = baseline_series;
 
-        //console.log("baseline series:" + baseline_series)
+        //console.log("baseline series:" + baseline_series);
 
         ecg_graph_to_plot = ecg_graph_condition;
         //ecg_graph_condition.series[1].data = baseline_series;
@@ -436,31 +446,38 @@ function update_ui(instruction)
        var baseline_hrv = instruction.baseline_hrv; 
        var condition_alpha = instruction.condition_alpha;
        var condition_hrv = instruction.condition_hrv;
+
+
+       barChartData.datasets[0].data[0] = baseline_hrv;
+       barChartData.datasets[0].data[1] = condition_hrv;
+
+       barChartData.datasets[1].data[0] = baseline_alpha;
+       barChartData.datasets[1].data[0] = condition_alpha;
+
+
+       console.log("baseline alpha: " + baseline_alpha + " condition alpha: " + condition_alpha)
+
+
     }
     else if (instruction.instruction_name == "CONNECTED")
     {
 	   if (instruction.type == "eeg"){
-		  $("#eeg_state_baseline").html( eeg_connected_text );
-          $("#eeg_state_condition").html( eeg_connected_text );
-
+		  $("#eeg_state").html( eeg_connected_text );
 	   }
 	else if (instruction.type == "ecg")
 	{
-		$("#ecg_state_baseline").html( eeg_connected_text );
-        $("#ecg_state_condition").html( eeg_connected_text );
+		$("#ecg_state").html( ecg_connected_text );
 	}
 }
 
 else if (instruction.instruction_name == "DISCONNECTED")
 {
 	if (instruction.type == "eeg"){
-		$("#eeg_state_baseline").html( eeg_connected_text );
-        $("#eeg_state_condition").html( eeg_connected_text );
+		$("#eeg_state").html( eeg_disconnected_text );
 	}
 	else if (instruction.type == "ecg")
 	{
-		$("#ecg_state_baseline").html( eeg_connected_text );
-        $("#ecg_state_condition").html( eeg_connected_text );
+		$("#ecg_state").html( eeg_disconnected_text );
 	}
 
 }

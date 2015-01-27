@@ -18,13 +18,14 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
+eeg_source = "fake" #fake or real
+ecg_source = "fake" #fake or real
 
-ECG_SIGNAL_IS_GOOD = 1
-eeg_source = "real" #fake or real
-ecg_source = "real" #fake or real
+#serverName = "server.neuron.brain"
+serverName = '127.0.0.1'
 
-#biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
-biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
+biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
+#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
 class SpacebrewClient(object):
     def __init__(self, name, server='127.0.0.1', port=9000): 
@@ -68,6 +69,8 @@ class SpacebrewClient(object):
             {'address': "/muse/elements/experimental/mellow", 'arguments': 1}
         ]
 
+        print "server: %s" % self.server
+
         self.ws = create_connection("ws://%s:%s" % (self.server, self.port))
 
         for path in self.osc_paths:
@@ -101,7 +104,7 @@ class SpacebrewClient(object):
 
         #print "path: %s" % path
 
-        if path == "alpha_absolute" and ECG_SIGNAL_IS_GOOD:
+        if path == "alpha_absolute":
             self.timestamp+=1 #should start incrementing (internal) timestamps after we've acquired signal from both EEG and ECG
             ecg = random.random();
             value_out = [timestamp] + [(float(value[2])+float(value[3]))/2] + [ecg]
@@ -296,34 +299,38 @@ parser.add_argument(
 
 if __name__ == "__main__":
 
+    print 'servername: %s' % serverName
+
     global sb_server #Not sure if this needs to be a global or can be made a property of a biodata_client class
     sb_server = SpacebrewServer(muse_ids=['fake-muse'], server='127.0.0.1') #simulating data coming in from our user's muse
 
     serverThread = ServerThread()
-    #serverThread.start()
+
+    if eeg_source == 'fake':
+        serverThread.start()
 
     global sb_server_2 # used for sending out instructions & processed EEG/ECG to the viz
     sb_server_2 = SpacebrewServer(server='127.0.0.1',port=9002,muse_ids=['booth-7'])
 
     global sb_client
     args = parser.parse_args()
-    serverName = 'server.neuron.brain'
-    sb_client = SpacebrewClient('booth-%s' % args.name, serverName) #in production, this will be set to server.neuron.brain
-    #sb_client.start()
+    sb_client = SpacebrewClient('booth-%s' % args.name, server=serverName) #in production, this will be set to server.neuron.brain
+
     listenerThread = ListenerThread()
     listenerThread.start()
 
-    # ecg = ecg_fake()
-    ecg = ecg_real()
-    t1 = threading.Thread(target=ecg.start)  
-    t1.daemon = False
-    t1.start()
+    if (ecg_source == 'real'):
+        ecg = ecg_real()
+        t1 = threading.Thread(target=ecg.start)  
+        t1.daemon = False
+        t1.start()
+    else:
+        ecg = ecg_fake()
+
 
     #file_dir = os.path.dirname(os.path.realpath(__file__))
 
     #hard-coding is bad! Somebody who knows python please find this file the right way 
-
-
 
     if sys.platform == 'win32': #windoze
         chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
@@ -339,7 +346,9 @@ if __name__ == "__main__":
 
     sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 10, condition_sec = 10, baseline_inst_sec = 2, condition_inst_sec = 2)
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
-    sb_client.set_handle_value('connect',sc.tag_in)
-    #sc.tag_in()
+    if (eeg_source == 'real'):
+        sb_client.set_handle_value('connect',sc.tag_in)
+    else:
+        sc.tag_in()
     
 
