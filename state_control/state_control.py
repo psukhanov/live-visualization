@@ -4,6 +4,9 @@ import threading
 from threading import Timer
 import time
 import json
+import  pyHook #for universal keyboard input
+import pythoncom
+
 
 #EXPERIMENT STATE CODES
 NO_EXPERIMENT = 0
@@ -36,10 +39,13 @@ class ChangeYourBrainStateControl( object ):
         self.condition_seconds = condition_sec
         self.baseline_instruction_seconds = baseline_inst_sec 
         self.condition_instruction_seconds = condition_inst_sec
+        self.baseline_confirmed = False
 
-        # self.kInputThread = KeyboardInputThread()
+        # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
-
+        self.kInputThread = WindowsKeyboardInput(self)
+        self.kInputThread.start()
+        print 'TEST1', self.kInputThread
         self.alpha_buffer = []
         self.hrv_last = 0
 
@@ -69,6 +75,7 @@ class ChangeYourBrainStateControl( object ):
         #devNote: put here possible confirmation of user change if in middle of experiment
         self.start_setup_instructions()
         self.tag_time = time.time()
+        print 'tagged in'
 
         ### start / reset a whole experiment timer + list of state times
         ### save logged data and reset variables
@@ -112,6 +119,8 @@ class ChangeYourBrainStateControl( object ):
         self.experiment_state = BASELINE_CONFIRMATION
         ### confirm
         self.output_instruction('CONFIRMATION')
+        while not self.baseline_confirmed:
+            pass
         time.sleep(1)
         ### collect subj info
         self.output_instruction('Q1')
@@ -133,8 +142,14 @@ class ChangeYourBrainStateControl( object ):
     def start_condition_collection(self):
         self.experiment_state = CONDITION_COLLECTION
         ### make sure to change this to average from start of baseline collection
-        self.baseline_alpha = sum(self.alpha_save_baseline['value']) / len(self.alpha_save_baseline['value'])
-        self.baseline_hrv = sum(self.hrv_save_baseline['value']) / len(self.hrv_save_baseline['value'])
+        if self.alpha_save_baseline['value']:
+            self.baseline_alpha = sum(self.alpha_save_baseline['value']) / len(self.alpha_save_baseline['value'])
+        else:
+            self.baseline_alpha = 0 ### change me to something better
+        if self.hrv_save_baseline['value']:
+            self.baseline_hrv = self.hrv_save_baseline['value'][-1]
+        else:
+            self.baseline_hrv = 0 ### change me
 
         #tell viz to go to the condition screen 
         instruction = {"message": {
@@ -168,6 +183,8 @@ class ChangeYourBrainStateControl( object ):
         time.sleep(1)
         self.output_instruction('Q3')
         time.sleep(1)
+        self.output_instruction('Q4')
+        time.sleep(1)
         ###*** how to collect this keyboard input if window focus is not on console!??? 
         self.start_post_experiment()
 
@@ -181,22 +198,24 @@ class ChangeYourBrainStateControl( object ):
 
     def output_instruction(self,sub_state=None):
         if self.experiment_state == SETUP_INSTRUCTIONS:
-            instruction_text = 'SETUP_INSTRUCTIONS'
+            instruction_text = 'This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin'
         elif self.experiment_state == BASELINE_INSTRUCTIONS:
-            instruction_text = 'BASELINE_INSTRUCTIONS'
+            instruction_text = 'Give us 30 seconds to calibrate to your brain and body. Please stay still and silent.'
         elif self.experiment_state == CONDITION_INSTRUCTIONS:
-            instruction_text = 'CONDITION_INSTRUCTIONS'
+            instruction_text = 'In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.'
         elif self.experiment_state in [CONDITION_CONFIRMATION,BASELINE_CONFIRMATION]:
             if sub_state == "CONFIRMATION" and self.experiment_state == BASELINE_CONFIRMATION:
                 instruction_text = "BASELINE_CONFIRMATION"
             elif sub_state == "CONFIRMATION" and self.experiment_state == CONDITION_CONFIRMATION:
                 instruction_text = "CONDITION_CONFIRMATION"
             elif sub_state == "Q1":
-                instruction_text = "Q1"
+                instruction_text = "Did you complete the exercises correctly? Type \'1\' for yes and \'0\' for no."
             elif sub_state == "Q2":
-                instruction_text = "Q2"
+                instruction_text = "How calm do you feel? type a number between 1 (not at all) and 9 (very)"
             elif sub_state == "Q3":
-                instruction_text = 'Q3'
+                instruction_text = 'How content are you? (1-9)'
+            elif sub_state == "Q4":
+                instruction_text = 'How distracted are you? (1-9)' 
             else:
                 raise Exception ('Unkown sub_state for instruction sent in state ' + str(self.experiment_state))
         else:
@@ -220,8 +239,8 @@ class ChangeYourBrainStateControl( object ):
 
         # print "hrv type:",type(self.ecg.get_hrv())
         # print "hrv:",self.ecg.get_hrv()
-        self.alpha_save_baseline['time'].append(time.time())
-        self.alpha_save_baseline['value'].append(self.ecg.get_hrv())
+        self.hrv_save_baseline['time'].append(time.time())
+        self.hrv_save_baseline['value'].append(self.ecg.get_hrv())
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
@@ -250,15 +269,21 @@ class ChangeYourBrainStateControl( object ):
 
     def output_post_experiment(self):
 
-        if (len(self.alpha_save['value']) > 0):
+        if len(self.alpha_save['value']):
             condition_alpha = sum(self.alpha_save['value'])/len(self.alpha_save['value'])
         else:
             condition_alpha = 0
 
-        baseline_hrv = 1
-        condition_hrv = 1.5
+        if self.hrv_save['value']:
+            condition_hrv = self.hrv_save['value'][-1]
+        else:
+            condition_hrv = 0 ### change me
 
-        value_out = {"instruction_name":"POST_EXPERIMENT","baseline_hrv":baseline_hrv,"baseline_alpha":baseline_alpha,"condition_alpha":condition_alpha,"condition_hrv":condition_hrv}
+        value_out = {"instruction_name":"POST_EXPERIMENT",
+                    "baseline_hrv":self.baseline_hrv,
+                    "baseline_alpha":self.baseline_alpha,
+                    "condition_alpha":condition_alpha,
+                    "condition_hrv":condition_hrv}
         message = {"message": { 
              "value": value_out,
              "type": "string", "name": "instruction", "clientName": self.client_name}}
@@ -303,10 +328,23 @@ class ChangeYourBrainStateControl( object ):
             ### confirm valid trial, collect subjective info and proceed to final display %%%
         #(otherwise do nothing!)
 
-class KeyboardInputThread ( threading.Thread ):
+    def win_keyboard_input(self,key_ID):
+        #devNote: could do this smarter by not calling this function unless in one of the appropriate states
+        if self.experiment_state == BASELINE_CONFIRMATION:
+            while 1:
+                if key_ID in [144,45]: #zero
+                    print "zero"
+                    self.baseline_confirmed = True
+            ### confirm valid trial, collect subjective info and proceed to condition
+        elif self.experiment_state == CONDITION_CONFIRMATION:
+            pass
+            ### confirm valid trial, collect subjective info and proceed to final display %%%
+        #(otherwise do nothing!)
+
+class ConsoleKeyboardInputThread ( threading.Thread ):
     
     def __init__(self):
-        super(KeyboardInputThread, self).__init__()
+        super(ConsoleKeyboardInputThread, self).__init__()
         self.running = True
 
     def stop ( self ):
@@ -315,4 +353,41 @@ class KeyboardInputThread ( threading.Thread ):
     def run ( self ):
         while self.running:
             keyboard_input()
+
+
+class WindowsKeyboardInput ( threading.Thread ):
+    
+    def __init__(self, sc_instance):
+        super(WindowsKeyboardInput, self).__init__()
+
+        print 'about to pump'
+
+        #super(WindowsKeyboardInput, self).__init__()
+        #self.running = True
+        self.state_control = sc_instance
+
+        #pythoncom.PumpMessages()
+
+
+    def stop ( self ):
+        pass
+
+    def run ( self ):
+        print "test04"
+        # create a hook manager
+        hm = pyHook.HookManager()
+        # watch for all mouse events
+        hm.KeyDown = self.OnKeyboardEvent
+        # set the hook
+        hm.HookKeyboard()
+        # wait forever
+        pythoncom.PumpMessages()
+
+    def OnKeyboardEvent(self,event):
+        #print 'Key:', event.Key
+        print 'KeyID:', event.KeyID
+        self.state_control.win_keyboard_input(event.KeyID)
+
+        # return True to pass the event to other handlers
+        return True
 
