@@ -80,6 +80,7 @@ class SpacebrewClient(object):
         self.brew.add_publisher("eeg_ecg","string")
         self.brew.add_publisher("instruction","string")
         self.brew.add_subscriber("alpha_absolute","string")
+        self.brew.add_subscriber("connect","string")
         #self.brew.subscribe('alpha_absolute',self.handle_value)
 
     def set_handle_value(self,metric,handler):
@@ -342,11 +343,12 @@ if __name__ == "__main__":
 
     #webbrowser.get(chrome_path).open(biodata_viz_url)    
     webbrowser.open(biodata_viz_url)    
-    time.sleep(4)
+    #time.sleep(4)
 
     sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 10, condition_sec = 10, baseline_inst_sec = 5, condition_inst_sec = 8)
     print 'hello world 5'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
+
     print 'attempting to tag in'
     sc.tag_in()
     

@@ -432,6 +432,10 @@ function update_ui(instruction)
     else if (instruction.instruction_name == "POST_EXPERIMENT")
     {
 	   $(document).trigger('goTo',4);
+       var baseline_alpha = instruction.baseline_alpha;
+       var baseline_hrv = instruction.baseline_hrv; 
+       var condition_alpha = instruction.condition_alpha;
+       var condition_hrv = instruction.condition_hrv;
     }
     else if (instruction.instruction_name == "CONNECTED")
     {
