@@ -12,27 +12,30 @@ from websocket import create_connection
 import threading
 from math import *
 import webbrowser
-from state_control import ChangeYourBrainStateControl
+#from state_control import ChangeYourBrainStateControl
 from subprocess import call
 from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_connect_string = "booth-7-connect"
-eeg_disconnect_string = "booth-7-disconnect"
+eeg_connect_string = "connect"
+eeg_disconnect_string = "disconnect"
 
 eeg_source = "fake" #fake or real
 #eeg_source = "real" #fake or real
+
 # ecg_source = "fake" #fake or real
-ecg_source = "real" #fake or real
+ecg_source = "fake" #fake or real
 
 if eeg_source == "real":
     serverName = "server.neuron.brain"
+    port_no = 9000
 else:
     serverName = '127.0.0.1'
+    port_no = 9000
 
-#biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
-biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
+biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
+#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
 class SpacebrewClient(object):
     def __init__(self, name, server='127.0.0.1', port=9000): 
@@ -91,7 +94,6 @@ class SpacebrewClient(object):
         self.brew.add_subscriber("alpha_absolute","string")
         self.brew.add_subscriber(eeg_connect_string,"string")
         self.brew.add_subscriber(eeg_disconnect_string,"string")
-        #self.brew.subscribe('alpha_absolute',self.handle_value)
 
     def set_handle_value(self,metric,handler):
         self.brew.subscribe(metric,handler)
@@ -131,6 +133,8 @@ class SpacebrewClient(object):
     def start(self):
         self.brew.start()
 
+    def tag_in():
+        print 'tagged in'
 
 class SpacebrewServer(object):
     def __init__(self, muse_ids=['fake-muse'], server='127.0.0.1', port=9000):
@@ -325,7 +329,7 @@ if __name__ == "__main__":
 
     global sb_client
     args = parser.parse_args()
-    sb_client = SpacebrewClient('booth-%s' % args.name, server=serverName) #in production, this will be set to server.neuron.brain
+    sb_client = SpacebrewClient('booth-%s' % args.name, server=serverName,port=port_no) #in production, this will be set to server.neuron.brain
 
     listenerThread = ListenerThread()
     listenerThread.start()
@@ -344,9 +348,7 @@ if __name__ == "__main__":
 
     #hard-coding is bad! Somebody who knows python please find this file the right way 
 
-
     print 'hello world 3'
-
 
     if sys.platform == 'win32': #windoze
         chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
@@ -372,5 +374,6 @@ if __name__ == "__main__":
         sc.tag_in()
     
     print 'attempting to tag in'
+
 
     
