@@ -83,9 +83,9 @@ function setBarChartData(data){
     ]
 
 }
-  console.log("myBar:" + window.myBar)
-  window.myBar.
-}
+//  console.log("myBar:" + window.myBar)
+//  window.myBar.
+//}
 
 // Radar Chart
 RadarChart.defaultConfig.color = function() {};
@@ -151,3 +151,5 @@ render();
 
 RadarChart.defaultConfig.levelTick = true;
 RadarChart.draw(".chart-container", data);
+
+};

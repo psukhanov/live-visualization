@@ -123,24 +123,30 @@ class ChangeYourBrainStateControl( object ):
         self.output_instruction('CONFIRMATION')
         while not self.baseline_confirmed:
             continue
+        self.baseline_subj = []
         ### collect subj info
         self.output_instruction('Q1')
         while not self.question_answer:
             continue
-        print "*** FINISHED Q1"
+        self.baseline_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q2')
         while not self.question_answer:
             continue
+        self.baseline_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q3')
         while not self.question_answer:
             continue
+        self.baseline_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q4')
         while not self.question_answer:
             continue
+        self.baseline_subj.append(self.question_answer)
         self.question_answer = False
+
+        print 'baseline user answers:',self.baseline_subj
         self.start_condition_instructions()
 
     def start_condition_instructions(self):
