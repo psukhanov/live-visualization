@@ -73,7 +73,7 @@ class ChangeYourBrainStateControl( object ):
         ### log data
         self.hrv_save['time'].append(time.time())
 
-    def tag_in(self):
+    def tag_in(self,muse_id):
         #devNote: put here possible confirmation of user change if in middle of experiment
         self.start_setup_instructions()
         self.tag_time = time.time()
@@ -146,7 +146,7 @@ class ChangeYourBrainStateControl( object ):
         self.baseline_subj.append(self.question_answer)
         self.question_answer = False
 
-        print 'baseline user answers:',self.baseline_subj
+        print 'baseline user answers: ',self.baseline_subj
         self.start_condition_instructions()
 
     def start_condition_instructions(self):
@@ -189,21 +189,33 @@ class ChangeYourBrainStateControl( object ):
     def start_post_condition(self):
         """ask for confirmation + subjective feedback"""
         self.experiment_state = CONDITION_CONFIRMATION
-        ### choose condition
-        ### confirm
         self.output_instruction('CONFIRMATION')
         while not self.condition_confirmed:
             continue
+        self.condition_subj = []
         ### collect subj info
         self.output_instruction('Q1')
-        time.sleep(1)
+        while not self.question_answer:
+            continue
+        self.condition_subj.append(self.question_answer)
+        self.question_answer = False
         self.output_instruction('Q2')
-        time.sleep(1)
+        while not self.question_answer:
+            continue
+        self.condition_subj.append(self.question_answer)
+        self.question_answer = False
         self.output_instruction('Q3')
-        time.sleep(1)
+        while not self.question_answer:
+            continue
+        self.condition_subj.append(self.question_answer)
+        self.question_answer = False
         self.output_instruction('Q4')
-        time.sleep(1)
-        ###*** how to collect this keyboard input if window focus is not on console!??? 
+        while not self.question_answer:
+            continue
+        self.condition_subj.append(self.question_answer)
+        self.question_answer = False
+
+        print 'condition user answers: ',self.condition_subj
         self.start_post_experiment()
 
     def start_post_experiment(self):
@@ -361,32 +373,49 @@ class ChangeYourBrainStateControl( object ):
             elif not self.question_answer:
                 if key_ID in [97,35]: 
                     self.question_answer = 1
-                if key_ID in [98,40]: 
+                elif key_ID in [98,40]: 
                     self.question_answer = 2
-                if key_ID in [99,34]: 
+                elif key_ID in [99,34]: 
                     self.question_answer = 3
-                if key_ID in [100,37]: 
+                elif key_ID in [100,37]: 
                     self.question_answer = 4
-                if key_ID in [101,12]: 
+                elif key_ID in [101,12]: 
                     self.question_answer = 5
-                if key_ID in [102,39]: 
+                elif key_ID in [102,39]: 
                     self.question_answer = 6
-                if key_ID in [103,36]: 
+                elif key_ID in [103,36]: 
                     self.question_answer = 7
-                if key_ID in [104,38]: 
+                elif key_ID in [104,38]: 
                     self.question_answer = 8
-                if key_ID in [105,33]: 
+                elif key_ID in [105,33]: 
                     self.question_answer = 9
-                if self.question_answer:
-                    print 'answered ',str(self.question_answer)
         elif self.experiment_state == CONDITION_CONFIRMATION:
-            if key_ID in [144,45]: #zero
-                print 'condition disconfirmed'
-                self.start_condition_instructions()
-            elif key_ID in [35,97]:
-                print 'condition confirmed'
-                self.condition_confirmed = True
-            ### confirm valid trial, collect subjective info and proceed to final display %%%
+            if not self.condition_confirmed:
+                if key_ID in [96,45]: #zero
+                    print 'condition disconfirmed'
+                    self.start_condition_instructions()
+                elif key_ID in [97,35]: #one
+                    print 'condition confirmed'
+                    self.condition_confirmed = True
+            elif not self.question_answer:
+                if key_ID in [97,35]: 
+                    self.question_answer = 1
+                elif key_ID in [98,40]: 
+                    self.question_answer = 2
+                elif key_ID in [99,34]: 
+                    self.question_answer = 3
+                elif key_ID in [100,37]: 
+                    self.question_answer = 4
+                elif key_ID in [101,12]: 
+                    self.question_answer = 5
+                elif key_ID in [102,39]: 
+                    self.question_answer = 6
+                elif key_ID in [103,36]: 
+                    self.question_answer = 7
+                elif key_ID in [104,38]: 
+                    self.question_answer = 8
+                elif key_ID in [105,33]: 
+                    self.question_answer = 9
         #(otherwise do nothing!)
 
 class ConsoleKeyboardInputThread ( threading.Thread ):

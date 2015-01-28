@@ -18,10 +18,10 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_connect_string = "booth-7-connect"
-eeg_disconnect_string = "booth-7-disconnect"
+eeg_connect_string = "connect"
+eeg_disconnect_string = "disconnect"
 
-eeg_source = "fake" #fake or real
+eeg_source = "real" #fake or real
 #eeg_source = "real" #fake or real
 # ecg_source = "fake" #fake or real
 ecg_source = "real" #fake or real
