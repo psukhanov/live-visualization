@@ -41,7 +41,7 @@ class ChangeYourBrainStateControl( object ):
         self.condition_instruction_seconds = condition_inst_sec
         self.baseline_confirmed = False
         self.condition_confirmed = False
-        self.question_answered = False
+        self.question_answer = False #temp holding of subjective rating
 
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
@@ -127,15 +127,16 @@ class ChangeYourBrainStateControl( object ):
         self.output_instruction('Q1')
         while not self.question_answer:
             continue
-        self.question_answered = False
+        print "*** FINISHED Q1"
+        self.question_answer = False
         self.output_instruction('Q2')
         while not self.question_answer:
             continue
-        self.question_answered = False
+        self.question_answer = False
         self.output_instruction('Q3')
         while not self.question_answer:
             continue
-        self.question_answered = False
+        self.question_answer = False
         self.output_instruction('Q4')
         while not self.question_answer:
             continue
@@ -211,7 +212,7 @@ class ChangeYourBrainStateControl( object ):
         if self.experiment_state == SETUP_INSTRUCTIONS:
             instruction_text = 'This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin'
         elif self.experiment_state == BASELINE_INSTRUCTIONS:
-            instruction_text = 'Give us 30 seconds to calibrate to your brain and body. Please stay still and silent.'
+            instruction_text = 'Give us 30 seconds to calibrate to your brain and body. Please stay still and silent, keeping your hands on the sensors.'
         elif self.experiment_state == CONDITION_INSTRUCTIONS:
             instruction_text = 'In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.'
         elif self.experiment_state in [CONDITION_CONFIRMATION,BASELINE_CONFIRMATION]:
@@ -291,10 +292,12 @@ class ChangeYourBrainStateControl( object ):
             condition_hrv = 0 ### change me
 
         value_out = {"instruction_name":"POST_EXPERIMENT",
-                    "baseline_hrv":self.baseline_hrv,
-                    "baseline_alpha":self.baseline_alpha,
-                    "condition_alpha":condition_alpha,
-                    "condition_hrv":condition_hrv}
+                    "baseline_hrv": 1, #self.baseline_hrv,
+                    "baseline_alpha": -1, #self.baseline_alpha,
+                    "baseline_subj": [4,3,2,1],
+                    "condition_hrv": -1, #condition_hrv,
+                    "condition_alpha": 1, #condition_alpha,
+                    "condition_subj": [1,2,3,4]}
         message = {"message": { 
              "value": value_out,
              "type": "string", "name": "instruction", "clientName": self.client_name}}
@@ -340,22 +343,36 @@ class ChangeYourBrainStateControl( object ):
         #(otherwise do nothing!)
 
     def win_keyboard_input(self,key_ID):
-        #devNote: could do this smarter by not calling this function unless in one of the appropriate states
+        #note: each key has 2 IDs because of Num Lock
         if self.experiment_state == BASELINE_CONFIRMATION:
             if not self.baseline_confirmed:
-                if key_ID in [144,45]: #zero
+                if key_ID in [96,45]: #zero
                     print 'baseline disconfirmed'
                     self.start_baseline_instructions()
-                elif key_ID in [35,97]:
+                elif key_ID in [97,35]: #one
                     print 'baseline confirmed'
                     self.baseline_confirmed = True
             elif not self.question_answer:
-                if key_ID in [35,97]:
+                if key_ID in [97,35]: 
                     self.question_answer = 1
+                if key_ID in [98,40]: 
+                    self.question_answer = 2
+                if key_ID in [99,34]: 
+                    self.question_answer = 3
+                if key_ID in [100,37]: 
+                    self.question_answer = 4
+                if key_ID in [101,12]: 
+                    self.question_answer = 5
+                if key_ID in [102,39]: 
+                    self.question_answer = 6
+                if key_ID in [103,36]: 
+                    self.question_answer = 7
+                if key_ID in [104,38]: 
+                    self.question_answer = 8
+                if key_ID in [105,33]: 
+                    self.question_answer = 9
                 if self.question_answer:
-                    print 'answered',self.question_answer
-
-        ### confirm valid trial, collect subjective info and proceed to condition
+                    print 'answered ',str(self.question_answer)
         elif self.experiment_state == CONDITION_CONFIRMATION:
             if key_ID in [144,45]: #zero
                 print 'condition disconfirmed'

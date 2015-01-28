@@ -34,10 +34,12 @@ POST_EXPERIMENT -> show screen with bar charts & description of changes that hap
 additional parameters: 
 	baseline_alpha: the average value of alpha waves during baseline, to plot on graph
 	baseline_hrv: the average value of hrv during baseline, to plot on graph
-	baseline_calm: The value entered by user for their "calm" level, following baseline. 
+	baseline_subj: user post-baseline answers, comma-delimited string of 4 values: calm, content, distracted, tbd 
 	condition_alpha: the average value of alpha waves during condition, to plot on graph
 	condition_hrv: the average value of hrv during condition, to plot on graph
-	condition_calm: The value entered by user for their "calm" level, following condition. 
+	condition_subj: user post-condition answers, comma-delimited string of 4 values: calm, content, distracted, tbd
+	interpretation_text: Text used to help user interpret final results
+	new_user_text: Text used to orient a new user who is considering using our station
 
 CONNECTED -> either the eeg or the ecg has started sending data. Update the eeg_connected or ecg_connected label. 
 additional_parameters: 
