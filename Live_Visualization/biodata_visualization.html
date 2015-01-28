@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="css/jquery.fullPage.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="css/radar-chart.css" type="text/css" media="screen" charset="utf-8" />
+        <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
         <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
         <script type="text/javascript" src="js/jq.js"></script>
         <script type="text/javascript" src="js/sb-1.4.1.js"></script>
@@ -16,7 +17,6 @@
         <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
         <script type="text/javascript" src="js/jquery.countdown360.js"></script>
 
-        <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
     </head>
     <body class="background-dark">
         <div class="container">
@@ -79,8 +79,7 @@
                     <div class="col-lg-4">
                         <section class="widget">
                             <header>
-                                <h4> &nbsp;
-                                    <!-- <span class="label label-danger">Instructions</span></h4> -->
+                             <!-- header -->
                             </header>
                             <div class="widget-body">
                             <!-- <div id="msg-content"></div> -->
@@ -132,6 +131,11 @@
                 <!-- <div class="row section" id="section"> -->
                     <div class="col-lg-8">
                         <section class="widget">
+                                <div id="bar-legend">
+                                    <i class="fa fa-circle" id="baseline-bar"></i> Baseline
+                                        <br>
+                                    <i class="fa fa-circle" id="condition-bar"></i> Condition
+                                </div>
                             <div id="barchart1">
                                 <div style="width: 100%">
                                     <canvas id="canvas" height="250" width="600"></canvas>
@@ -139,9 +143,10 @@
                             </div>
                         </section>
                         <section class="widget">
-                            <div class="chart-container">
-                                <div id="radar-chart"></div>
-                            </div>
+                            <!--<div class="chart-container">-->
+                            <canvas id="canvas_radar" height="250" width="600"></canvas>
+                               <!-- <div id="radar-chart"></div>-->
+                            <!--</div>-->
                         </section>
                     </div>
                     <div class="col-md-4">
@@ -169,7 +174,10 @@
         </div>
         <script type="text/javascript" src="js/d3.v3.min.js"></script>
         <script type="text/javascript" src="js/bloom.js"></script>
-
+        <script type="text/javascript" src="js/Chart.js"></script>
+        <script type="text/javascript" src="js/jquery.fullPage.js"></script>
+        <script type="text/javascript" src="js/radar-chart.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
         <script type="text/javascript">
             // variables to change
             var bufferLength = 120;
@@ -290,7 +298,7 @@
             var eeg_graph_to_plot = eeg_graph_baseline;
             var ecg_graph_to_plot = ecg_graph_baseline;
 
-            var alpha_avg_baseline = 0; 
+            var alpha_avg_baseline = 0;
             var hrv_avg_baseline = 0;
 
 /**
@@ -309,16 +317,19 @@ function setup (){
     // connect to spacbrew
     sb.connect();
 
-        /*d3.select('#eeg_graph_condition svg')
-        .append('line')
-        .attr({
-            x1: 0,// eeg_graph_to_plot.xAxis.scale()(0),
-            y1: 150,// eeg_graph_to_plot.yAxis.scale()(10),
-            x2: graph_width,//eeg_graph_to_plot.xAxis.scale()(100),
-            y2: 150//eeg_graph_to_plot.yAxis.scale()(10)
-        })
-        .style("stroke", "#000");
-        console.log("eeg graph condition" + eeg_graph_condition);*/
+    var finalData = [];
+
+       finalData[0] = 0.5;
+       finalData[1] = 0.7;
+
+       finalData[2] = 0.4;
+       finalData[3] = 0.6;
+
+       drawBarChart(finalData);
+
+       var beforeValues = [1,3,2,4];
+       var afterValues = [5,3,4,5];
+       drawRadarChart(beforeValues,afterValues);
 }
 /**
 * Function that is called when Spacebrew connection is established
@@ -383,7 +394,7 @@ else if (name == "eeg_ecg")
             baseline_hrv_buffer.shift();
         }
         baseline_hrv_buffer.push({"x":timestamp,"y":hrv_avg_baseline});
-        ecg_graph_condition.series[1].data = baseline_hrv_buffer;  
+        ecg_graph_condition.series[1].data = baseline_hrv_buffer;
         ecg_graph_condition.render();
       }
 
@@ -408,6 +419,7 @@ function clear_graph()
 
 function update_ui(instruction)
 {
+
     if (instruction.instruction_name == "DISPLAY_INSTRUCTION")
     {
       var message = instruction.instruction_text;
@@ -421,6 +433,9 @@ function update_ui(instruction)
         // start timer
         eeg_graph_to_plot = eeg_graph_baseline;
         ecg_graph_to_plot = ecg_graph_baseline;
+
+        eeg_buffer = [];
+        ecg_buffer = [];
 
         start_baseline_timer(baseline_seconds);
         $(document).trigger('goTo',2);
@@ -446,17 +461,23 @@ function update_ui(instruction)
     {
 	   $(document).trigger('goTo',4);
        var baseline_alpha = instruction.baseline_alpha;
-       var baseline_hrv = instruction.baseline_hrv; 
+       var baseline_hrv = instruction.baseline_hrv;
        var condition_alpha = instruction.condition_alpha;
        var condition_hrv = instruction.condition_hrv;
 
+       var finalData = [];
 
-       barChartData.datasets[0].data[0] = baseline_hrv;
-       barChartData.datasets[0].data[1] = condition_hrv;
+       finalData[0] = baseline_hrv;
+       finalData[1] = condition_hrv;
 
-       barChartData.datasets[1].data[0] = baseline_alpha;
-       barChartData.datasets[1].data[0] = condition_alpha;
+       finalData[2] = baseline_alpha;
+       finalData[3] = condition_alpha;
 
+       drawBarChart(finalData);
+
+       var beforeValues = instruction.baseline_subj;
+       var afterValues = instruction.condition_subj;
+       drawRadarChart(beforeValues,afterValues);
 
        console.log("baseline alpha: " + baseline_alpha + " condition alpha: " + condition_alpha)
 
@@ -493,7 +514,7 @@ function start_baseline_timer(seconds)
                  radius: 95,
                  seconds: seconds,
                  label: ['sec', 'secs'],
-                fontColor: '#FFFFFF',
+                 fontColor: '#FFFFFF',
                  strokeStyle: '#f5f5f5',
                  fillStyle: '#e5603b',
                  autostart: false,
@@ -568,10 +589,5 @@ function makeAverageBaseline(value, buffer) {
 // start_baseline_timer()
 
 </script>
-<!--<script type="text/javascript" src="js/countdown.js"></script>-->
-<script type="text/javascript" src="js/Chart.js"></script>
-<script type="text/javascript" src="js/jquery.fullPage.js"></script>
-<script type="text/javascript" src="js/radar-chart.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
 </body>
 </html>

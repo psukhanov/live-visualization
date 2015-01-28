@@ -4,9 +4,9 @@ import threading
 from threading import Timer
 import time
 import json
-import  pyHook #for universal keyboard input
+import pyHook #for universal keyboard input
 import pythoncom
-
+import random
 
 #EXPERIMENT STATE CODES
 NO_EXPERIMENT = 0
@@ -73,7 +73,8 @@ class ChangeYourBrainStateControl( object ):
         ### log data
         self.hrv_save['time'].append(time.time())
 
-    def tag_in(self,muse_id):
+
+    def tag_in(self,muse_id='0000'):
         #devNote: put here possible confirmation of user change if in middle of experiment
         self.start_setup_instructions()
         self.tag_time = time.time()
@@ -264,7 +265,7 @@ class ChangeYourBrainStateControl( object ):
             self.alpha_save_baseline['time'].append(time.time())
             self.alpha_save_baseline['value'].append(alpha_out)
         else: 
-            alpha_out = 1
+            alpha_out = random.random()
         self.alpha_buffer = []
 
         # print "hrv type:",type(self.ecg.get_hrv())
@@ -287,7 +288,7 @@ class ChangeYourBrainStateControl( object ):
             self.alpha_save['time'].append(time.time())
             self.alpha_save['value'].append(alpha_out)
         else: 
-            alpha_out = 1
+            alpha_out = random.random()
         self.alpha_buffer = []
 
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
