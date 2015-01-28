@@ -201,7 +201,7 @@ class ecg_fake():
             return False
 
     def get_hrv(self):
-        return 1
+        return random.random()
 
 class ecg_real(object):
 
