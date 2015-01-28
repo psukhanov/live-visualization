@@ -61,7 +61,31 @@ window.onload = function(){
     });
 }
 
+function setBarChartData(data){
+  var barChartData = {
+    labels : ["Average HRV","Average Alpha EEG"],
+    datasets : [
+        {
+            fillColor : "rgba(220,220,220,0.5)",
+            strokeColor : "rgba(220,220,220,0.8)",
+            highlightFill: "rgba(220,220,220,0.75)",
+            highlightStroke: "rgba(220,220,220,1)",
+            data : [data[0],data[1]]
+        },
+        {
+            fillColor : "rgb(234, 200, 94)",
+            strokeColor : "rgb(234, 200, 98)",
+            highlightFill : "#eac85e",
+            highlightStroke : "#eac85e",
+            // highlightStroke : "rgba(151,187,205,1)",
+            data : [data[2],data[3]]
+        }
+    ]
 
+}
+//  console.log("myBar:" + window.myBar)
+//  window.myBar.
+//}
 
 // Radar Chart
 RadarChart.defaultConfig.color = function() {};
@@ -127,3 +151,5 @@ render();
 
 RadarChart.defaultConfig.levelTick = true;
 RadarChart.draw(".chart-container", data);
+
+};

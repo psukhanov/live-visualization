@@ -18,15 +18,22 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
+eeg_connect_string = "booth-7-connect"
+eeg_disconnect_string = "booth-7-disconnect"
+
 eeg_source = "fake" #fake or real
-ecg_source = "fake" #fake or real
+#eeg_source = "real" #fake or real
+# ecg_source = "fake" #fake or real
+ecg_source = "real" #fake or real
 
-#serverName = "server.neuron.brain"
-serverName = '127.0.0.1'
+if eeg_source == "real":
+    serverName = "server.neuron.brain"
+else:
+    serverName = '127.0.0.1'
 
-#set the file
-biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
-#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
+
+#biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
+biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
 class SpacebrewClient(object):
     def __init__(self, name, server='127.0.0.1', port=9000):
@@ -83,7 +90,8 @@ class SpacebrewClient(object):
         self.brew.add_publisher("eeg_ecg","string")
         self.brew.add_publisher("instruction","string")
         self.brew.add_subscriber("alpha_absolute","string")
-        self.brew.add_subscriber("connect","string")
+        self.brew.add_subscriber(eeg_connect_string,"string")
+        self.brew.add_subscriber(eeg_disconnect_string,"string")
         #self.brew.subscribe('alpha_absolute',self.handle_value)
 
     def set_handle_value(self,metric,handler):
@@ -194,7 +202,7 @@ class ecg_fake():
             return False
 
     def get_hrv(self):
-        return 1
+        return random.random()
 
 class ecg_real(object):
 
@@ -359,8 +367,9 @@ if __name__ == "__main__":
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
     if (eeg_source == 'real'):
-        sb_client.set_handle_value('connect',sc.tag_in)
+        sb_client.set_handle_value(eeg_connect_string,sc.tag_in)
     else:
+        time.sleep(4)
         sc.tag_in()
 
     print 'attempting to tag in'
