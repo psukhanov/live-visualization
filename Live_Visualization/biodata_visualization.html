@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="css/application.min.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="css/jquery.fullPage.css" type="text/css" media="screen" charset="utf-8" />
         <link rel="stylesheet" href="css/radar-chart.css" type="text/css" media="screen" charset="utf-8" />
+        <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
         <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
         <script type="text/javascript" src="js/jq.js"></script>
         <script type="text/javascript" src="js/sb-1.4.1.js"></script>
@@ -16,7 +17,6 @@
         <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
         <script type="text/javascript" src="js/jquery.countdown360.js"></script>
 
-        <link type="text/css" rel="stylesheet" href="../rickshaw-master/rickshaw.min.css">
     </head>
     <body class="background-dark">
         <div class="container">
@@ -79,7 +79,7 @@
                     <div class="col-lg-4">
                         <section class="widget">
                             <header>
-                                <h4>More Information &nbsp;
+                                <!-- <h4>More Information &nbsp; -->
                                     <!-- <span class="label label-danger">Instructions</span></h4> -->
                             </header>
                             <div class="widget-body">
@@ -132,6 +132,11 @@
                 <!-- <div class="row section" id="section"> -->
                     <div class="col-lg-8">
                         <section class="widget">
+                                <div id="bar-legend">
+                                    <i class="fa fa-circle" id="baseline-bar"></i> Baseline
+                                        <br>
+                                    <i class="fa fa-circle" id="condition-bar"></i> Condition
+                                </div>
                             <div id="barchart1">
                                 <div style="width: 100%">
                                     <canvas id="canvas" height="250" width="600"></canvas>
@@ -141,6 +146,11 @@
                         <section class="widget">
                             <div class="chart-container">
                                 <div id="radar-chart"></div>
+                                <div id="radar-legend">
+                                    <i class="fa fa-circle" id="before-radar"></i> Before
+                                        <br>
+                                    <i class="fa fa-circle" id="after-radar"></i> After
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -443,7 +453,7 @@ function update_ui(instruction)
     {
 	   $(document).trigger('goTo',4);
        var baseline_alpha = instruction.baseline_alpha;
-       var baseline_hrv = instruction.baseline_hrv; 
+       var baseline_hrv = instruction.baseline_hrv;
        var condition_alpha = instruction.condition_alpha;
        var condition_hrv = instruction.condition_hrv;
 
@@ -490,7 +500,7 @@ function start_baseline_timer(seconds)
                  radius: 95,
                  seconds: seconds,
                  label: ['sec', 'secs'],
-                fontColor: '#FFFFFF',
+                 fontColor: '#FFFFFF',
                  strokeStyle: '#f5f5f5',
                  fillStyle: '#e5603b',
                  autostart: false,
