@@ -235,3 +235,4 @@ function drawRadar(data){
 RadarChart.draw(".chart-container", data);
 
 }
+

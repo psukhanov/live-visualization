@@ -34,11 +34,11 @@ else:
     serverName = '127.0.0.1'
     port_no = 9000
 
-biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
-#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
+#biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
+biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
 class SpacebrewClient(object):
-    def __init__(self, name, server='127.0.0.1', port=9000): 
+    def __init__(self, name, server='127.0.0.1', port=9000):
         self.server = server
         self.port = port
         self.timestamp = 0
@@ -87,7 +87,7 @@ class SpacebrewClient(object):
         for path in self.osc_paths:
             spacebrew_name = path['address'].split('/')[-1]
             #self.brew.add_subscriber(spacebrew_name, "string")
-            #self.brew.subscribe(spacebrew_name, self.handle_value)   
+            #self.brew.subscribe(spacebrew_name, self.handle_value)
 
         self.brew.add_publisher("eeg_ecg","string")
         self.brew.add_publisher("instruction","string")
@@ -110,7 +110,7 @@ class SpacebrewClient(object):
             instruction = {"message": {
                 "value" : {"instruction_name": "DISPLAY_INSTRUCTION", "instruction_text": "testing 1 2 3 yeah"},
                 "type": "string", "name": "instruction", "clientName": self.client_name}}
-        
+
             sb_server_2.ws.send(json.dumps(instruction))'''
 
         #print "path: %s" % path
@@ -158,8 +158,8 @@ class SpacebrewServer(object):
                         }
                     }
                 }
-            self.ws.send(json.dumps(config))    
-        
+            self.ws.send(json.dumps(config))
+
         elif (port==9002):
             config = {
                     'config': {
@@ -167,9 +167,9 @@ class SpacebrewServer(object):
                         'publish': {
                             'messages': [{'name': 'eeg_ecg', 'type' : 'string'},{'name' : 'instruction', 'type' : 'string'}]
                      }
-                    }   
+                    }
                 }
-            self.ws.send(json.dumps(config))    
+            self.ws.send(json.dumps(config))
 
     def start(self):
         time_stamp = 0
@@ -185,7 +185,7 @@ class SpacebrewServer(object):
 
                     message = {"message": {
                         "value": value,
-                        "type": "string", "name": metric, "clientName": muse_id}}    
+                        "type": "string", "name": metric, "clientName": muse_id}}
                     self.ws.send(json.dumps(message))
 
 
@@ -194,7 +194,7 @@ class ecg_fake():
 
     def __init__(self):
         self.lead_count = 0
-        
+
     def is_lead_on(self):
         self.lead_count += 1
         if self.lead_count > 5:
@@ -213,7 +213,7 @@ class ecg_real(object):
     def __init__(self):
 
         self.lead_count = 0
-        
+
         target_port = 'COM3'
         #target_port = 'devA/tty.XXXXXXX'  #change this to work on OSX
 
@@ -234,9 +234,9 @@ class ecg_real(object):
         # start running the serial producer thread
         self.nskECG.start()
 
-        # this loop is the consumer thread, and will pop 
+        # this loop is the consumer thread, and will pop
         # dict values (with 'timestamp', 'ecg_raw', and 'leadoff'
-        # from the internal buffer and run the analysis on the 
+        # from the internal buffer and run the analysis on the
         # data.
 
         self.cur_hrv = None #whatever the current hrv value is
@@ -269,7 +269,7 @@ class ecg_real(object):
                     self.cur_hrv_t = D['timestamp']
 
             # we keep looping until something tells us to stop
-        pass #      
+        pass #
 
     def is_lead_on(self):
         return self.cur_lead_on
@@ -281,7 +281,7 @@ class ecg_real(object):
             return 0
 
 class ServerThread ( threading.Thread ):
-    
+
     def __init__(self):
         super(ServerThread, self).__init__()
         self.running = True
@@ -336,7 +336,7 @@ if __name__ == "__main__":
 
     if (ecg_source == 'real'):
         ecg = ecg_real()
-        t1 = threading.Thread(target=ecg.start)  
+        t1 = threading.Thread(target=ecg.start)
         t1.daemon = False
         t1.start()
     else:
@@ -346,7 +346,7 @@ if __name__ == "__main__":
 
     #file_dir = os.path.dirname(os.path.realpath(__file__))
 
-    #hard-coding is bad! Somebody who knows python please find this file the right way 
+    #hard-coding is bad! Somebody who knows python please find this file the right way
 
     print 'hello world 3'
 
@@ -359,8 +359,8 @@ if __name__ == "__main__":
 
     print 'hello world 4'
 
-    #webbrowser.get(chrome_path).open(biodata_viz_url)    
-    webbrowser.open(biodata_viz_url)    
+    #webbrowser.get(chrome_path).open(biodata_viz_url)
+    webbrowser.open(biodata_viz_url)
     #time.sleep(4)
 
     sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 10, condition_sec = 10, baseline_inst_sec = 5, condition_inst_sec = 8)
@@ -372,8 +372,6 @@ if __name__ == "__main__":
     else:
         time.sleep(4)
         sc.tag_in()
-    
+
     print 'attempting to tag in'
 
-
-    

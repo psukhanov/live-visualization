@@ -167,3 +167,37 @@ circle {
 text .middle {
   margin: 15px;
 }
+
+#radar-legend {
+  position: absolute;
+  right: 40px;
+  font-size: 24px;
+}
+
+.widget #before-radar {
+  color: #FFD700;
+}
+
+.widget #after-radar {
+  color: #ADD8E6;
+}
+
+#radar-legend {
+  position: absolute;
+  right: 40px;
+  font-size: 24px;
+}
+
+.widget #baseline-bar {
+  color: rgba(220,220,220,0.5);
+}
+
+.widget #condition-bar {
+  color: rgb(234, 200, 94);
+}
+
+#radar-legend {
+  position: absolute;
+  bottom: 20px;
+  font-size: 18px;
+}
