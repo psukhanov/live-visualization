@@ -235,3 +235,13 @@ text .middle {
 #hrv-change, #new-user-description {
   font-color: #e5603b;
 }
+
+#barchart1 canvas {
+  width: 45% !important;
+  height: 210px !important;
+}
+
+#radarchart1 canvas {
+  width: 75% !important;
+  height: auto !important;
+}

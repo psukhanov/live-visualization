@@ -108,7 +108,7 @@ function drawBarChart (data){
     window.myBar = new Chart(ctx).Bar(barChartData, {
         // responsive : true,
         // scaleShowGridLines : false,
-        scaleFontSize: 22,
+        scaleFontSize: 30,
         scaleFontColor: "#FFF",
         scaleFontFamily: "'Open Sans',sans-serif;",
         scaleLineColor: "#FFF",
@@ -120,7 +120,7 @@ function drawBarChart (data){
     var newctx = document.getElementById("canvas2").getContext("2d");
     var options = {
         // responsive : true,
-        scaleFontSize: 22,
+        scaleFontSize: 30,
         scaleFontColor: "#FFF",
         scaleFontFamily: "'Open Sans',sans-serif;",
         scaleLineColor: "#FFF",
@@ -168,6 +168,7 @@ function drawRadarChart(before_data,after_data){
 
   var radarData = setRadarChartData(before_data,after_data);
   var ctx = document.getElementById("canvas_radar").getContext("2d");
+  ctx.font="100px Arial";
 
   var legendTemplate  = "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].lineColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
 
