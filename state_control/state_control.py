@@ -157,7 +157,6 @@ class ChangeYourBrainStateControl( object ):
         ### make sure to change this to average from start of baseline collection
         if self.alpha_save_baseline['value']:
             self.baseline_alpha = sum(self.alpha_save_baseline['value']) / len(self.alpha_save_baseline['value'])
-            print "***** BASELINE ALPHA AVG",self.baseline_alpha
         else:
             self.baseline_alpha = 0 ### change me to something better
         if self.hrv_save_baseline['value']:
@@ -251,7 +250,7 @@ class ChangeYourBrainStateControl( object ):
             elif sub_state == "Q3":
                 instruction_text = 'How distracted are you? (1-9)' 
             elif sub_state == "Q4":
-                instruction_text = 'Some other question goes here (1-9)' 
+                instruction_text = 'How joyous do you feel? (1-9)' 
             else:
                 raise Exception ('Unkown sub_state for instruction sent in state ' + str(self.experiment_state))
         else:
@@ -283,7 +282,7 @@ class ChangeYourBrainStateControl( object ):
              "value": value_out,
              "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
         self.sb_server.ws.send(json.dumps(message))
-        print "output baseline: {}".format(value_out) #^^^
+        # print "output baseline: {}".format(value_out) #^^^
 
 
     def output_condition(self):
@@ -304,7 +303,7 @@ class ChangeYourBrainStateControl( object ):
              "value": value_out,
              "type": "string", "name": "eeg_ecg", "clientName": self.client_name}}
         self.sb_server.ws.send(json.dumps(message))
-        print "output condition: {}".format(value_out) #^^^
+        # print "output condition: {}".format(value_out) #^^^
 
     def output_post_experiment(self):
 

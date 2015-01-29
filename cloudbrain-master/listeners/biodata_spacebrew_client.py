@@ -18,11 +18,11 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_source = "fake" #fake or real
-# eeg_source = "real" #fake or real
+eeg_source = "real" #fake or real
+# eeg_source = "fake" #fake or real
 
-ecg_source = "fake" #fake or real
-# ecg_source = "real" #fake or real
+ecg_source = "real" #fake or real
+# ecg_source = "fake" #fake or real
 
 if eeg_source == "real":
     serverName = "server.neuron.brain"
@@ -254,10 +254,10 @@ class ecg_real(object):
                 # if we are more than 2 seconds in and leadoff is still zero
                 if D['leadoff']==0:
                     leadoff_count+=1
-                    if leadoff_count> self.nskECG.Fs*2:
+                    if leadoff_count> self.nskECG.Fs*15:
                         if self.nskECG.getTotalNumRRI()!=0:
                             #reset the library
-                            self.nskECG.ecgalgResetLib()
+                            self.nskECG.ecgResetAlgLib()
                         self.nskECG.ecg_buffer.task_done() #let queue know that we're done
                         continue
                 else: # leadoff==200, or lead is on
@@ -366,13 +366,16 @@ if __name__ == "__main__":
     #time.sleep(4)
 
     # uncomment next line to run full timing
-    # sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
-    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
+    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
+    # uncomment the next line to run expidited timing (DO NOT CHANGE VALUES)
+    # sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
     print 'hello world 5'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
     if (eeg_source == 'real'):
-        sb_client.set_handle_value(eeg_connect_string,sc.tag_in)
+        time.sleep(4)
+        sc.tag_in()
+        # sb_client.set_handle_value(eeg_connect_string,sc.tag_in)
     else:
         time.sleep(4)
         sc.tag_in()
