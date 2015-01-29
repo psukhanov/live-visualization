@@ -317,7 +317,7 @@ function setup (){
     // connect to spacbrew
     sb.connect();
 
-    var finalData = [];
+    /*var finalData = [];
 
        finalData[0] = 0.5;
        finalData[1] = 0.7;
@@ -329,7 +329,7 @@ function setup (){
 
        var beforeValues = [1,3,2,4];
        var afterValues = [5,3,4,5];
-       drawRadarChart(beforeValues,afterValues);
+       drawRadarChart(beforeValues,afterValues);*/
 }
 /**
 * Function that is called when Spacebrew connection is established
@@ -448,6 +448,9 @@ function update_ui(instruction)
        eeg_buffer = [];
        ecg_buffer = [];
 
+       baseline_hrv_buffer = [];
+       baseline_eeg_buffer = [];
+
        alpha_avg_baseline = instruction.baseline_alpha;
        hrv_avg_baseline =  instruction.baseline_hrv;
 
@@ -479,7 +482,7 @@ function update_ui(instruction)
        var afterValues = instruction.condition_subj;
        drawRadarChart(beforeValues,afterValues);
 
-       console.log("baseline alpha: " + baseline_alpha + " condition alpha: " + condition_alpha)
+       console.log("before values: " + beforeValues + " after values: " + afterValues)
 
 
     }

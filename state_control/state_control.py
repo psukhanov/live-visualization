@@ -45,7 +45,9 @@ class ChangeYourBrainStateControl( object ):
 
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
-        self.kInputThread = WindowsKeyboardInput(self)
+        #self.kInputThread = WindowsKeyboardInput(self)
+        #self.kInputThread.start()
+        self.kInputThread = FakeKeyboardInput(self)
         self.kInputThread.start()
 
         self.alpha_buffer = []
@@ -123,27 +125,31 @@ class ChangeYourBrainStateControl( object ):
         ### confirm
         self.output_instruction('CONFIRMATION')
         while not self.baseline_confirmed:
-            continue
+            continue    
         self.baseline_subj = []
         ### collect subj info
         self.output_instruction('Q1')
         while not self.question_answer:
             continue
+        print '***1'
         self.baseline_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q2')
         while not self.question_answer:
             continue
+        print '***2'
         self.baseline_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q3')
         while not self.question_answer:
             continue
+        print '***3'
         self.baseline_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q4')
         while not self.question_answer:
             continue
+        print '***4'
         self.baseline_subj.append(self.question_answer)
         self.question_answer = False
 
@@ -162,6 +168,7 @@ class ChangeYourBrainStateControl( object ):
         ### make sure to change this to average from start of baseline collection
         if self.alpha_save_baseline['value']:
             self.baseline_alpha = sum(self.alpha_save_baseline['value']) / len(self.alpha_save_baseline['value'])
+            print "***** BASELINE ALPHA AVG",self.baseline_alpha
         else:
             self.baseline_alpha = 0 ### change me to something better
         if self.hrv_save_baseline['value']:
@@ -198,21 +205,25 @@ class ChangeYourBrainStateControl( object ):
         self.output_instruction('Q1')
         while not self.question_answer:
             continue
+        print '***1'
         self.condition_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q2')
         while not self.question_answer:
             continue
+        print '***2'
         self.condition_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q3')
         while not self.question_answer:
             continue
+        print '***3'
         self.condition_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q4')
         while not self.question_answer:
             continue
+        print '***4'
         self.condition_subj.append(self.question_answer)
         self.question_answer = False
 
@@ -265,7 +276,8 @@ class ChangeYourBrainStateControl( object ):
             self.alpha_save_baseline['time'].append(time.time())
             self.alpha_save_baseline['value'].append(alpha_out)
         else: 
-            alpha_out = random.random()
+            alpha_out = random.random() ###
+            print 'baseline: alpha_buffer empty!'
         self.alpha_buffer = []
 
         # print "hrv type:",type(self.ecg.get_hrv())
@@ -311,17 +323,17 @@ class ChangeYourBrainStateControl( object ):
             condition_hrv = 0 ### change me
 
         value_out = {"instruction_name":"POST_EXPERIMENT",
-                    "baseline_hrv": 1, #self.baseline_hrv,
-                    "baseline_alpha": -1, #self.baseline_alpha,
+                    "baseline_hrv": self.baseline_hrv,
+                    "baseline_alpha": self.baseline_alpha,
                     "baseline_subj": [4,3,2,1],
-                    "condition_hrv": -1, #condition_hrv,
-                    "condition_alpha": 1, #condition_alpha,
+                    "condition_hrv": condition_hrv,
+                    "condition_alpha": condition_alpha,
                     "condition_subj": [1,2,3,4]}
         message = {"message": { 
              "value": value_out,
              "type": "string", "name": "instruction", "clientName": self.client_name}}
         self.sb_server.ws.send(json.dumps(message))
-        print "output post experiment" #^^^
+        print "output post experiment",value_out #^^^
 
 
     ######################################################
@@ -459,4 +471,21 @@ class WindowsKeyboardInput ( threading.Thread ):
 
         # return True to pass the event to other handlers
         return True
+
+
+class FakeKeyboardInput ( threading.Thread ):
+    
+    def __init__(self, sc_instance):
+        super(FakeKeyboardInput, self).__init__()
+        self.state_control = sc_instance
+
+    def stop ( self ):
+        pass
+
+    def run ( self ):
+        while True:
+            for k in xrange(97,101):
+                print k
+                self.state_control.win_keyboard_input(k)
+                time.sleep(1)
 

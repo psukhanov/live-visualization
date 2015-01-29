@@ -12,20 +12,17 @@ from websocket import create_connection
 import threading
 from math import *
 import webbrowser
-#from state_control import ChangeYourBrainStateControl
+from state_control import ChangeYourBrainStateControl
 from subprocess import call
 from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_connect_string = "connect"
-eeg_disconnect_string = "disconnect"
-
-eeg_source = "real" #fake or real
+eeg_source = "fake" #fake or real
 #eeg_source = "real" #fake or real
 
-# ecg_source = "fake" #fake or real
 ecg_source = "fake" #fake or real
+# ecg_source = "real" #fake or real
 
 if eeg_source == "real":
     serverName = "server.neuron.brain"
@@ -33,6 +30,11 @@ if eeg_source == "real":
 else:
     serverName = '127.0.0.1'
     port_no = 9000
+
+eeg_connect_string = "connect"
+eeg_disconnect_string = "disconnect"
+
+
 
 #biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
 biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
