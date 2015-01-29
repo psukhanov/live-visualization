@@ -39,8 +39,6 @@ class ChangeYourBrainStateControl( object ):
         self.condition_seconds = condition_sec
         self.baseline_instruction_seconds = baseline_inst_sec 
         self.condition_instruction_seconds = condition_inst_sec
-        self.baseline_confirmed = False
-        self.condition_confirmed = False
         self.question_answer = False #temp holding of subjective rating
 
         # self.kInputThread = ConsoleKeyboardInputThread()
@@ -109,10 +107,14 @@ class ChangeYourBrainStateControl( object ):
     def start_post_baseline(self):
         """ask for confirmation + subjective feedback + selection of condition"""
         self.experiment_state = BASELINE_CONFIRMATION
-        ### confirm
+        self.baseline_confirmation = 0 #confirmed = 1, disconfirmed = -1
         self.output_instruction('CONFIRMATION')
-        while not self.baseline_confirmed:
-            continue    
+        while not self.baseline_confirmation: #neither confirmed nor disconfirmed
+            continue
+        if self.baseline_confirmation < 0: 
+            self.start_baseline_instructions()
+            print 'returning from post_baseline'
+            return
         self.baseline_subj = []
         ### collect subj info
         self.output_instruction('Q1')
@@ -184,15 +186,20 @@ class ChangeYourBrainStateControl( object ):
     def start_post_condition(self):
         """ask for confirmation + subjective feedback"""
         self.experiment_state = CONDITION_CONFIRMATION
+        self.condition_confirmation = 0 #confirmed = 1, disconfirmed = -1
         self.output_instruction('CONFIRMATION')
-        while not self.condition_confirmed:
+        while not self.condition_confirmation: #neither confirmed nor disconfirmed
             continue
+        if self.condition_confirmation < 0: 
+            self.start_condition_instructions()
+            print 'returning from post_condition'
+            return
         self.condition_subj = []
         ### collect subj info
         self.output_instruction('Q1')
         while not self.question_answer:
             continue
-        print '***1'
+        print '***1!!!'
         self.condition_subj.append(self.question_answer)
         self.question_answer = False
         self.output_instruction('Q2')
@@ -315,7 +322,7 @@ class ChangeYourBrainStateControl( object ):
         value_out = {"instruction_name":"POST_EXPERIMENT",
                     "baseline_hrv": self.baseline_hrv,
                     "baseline_alpha": self.baseline_alpha,
-                    "baseline_subj": self.condition_subj,
+                    "baseline_subj": self.baseline_subj,
                     "condition_hrv": condition_hrv,
                     "condition_alpha": condition_alpha,
                     "condition_subj": self.condition_subj}
@@ -366,13 +373,13 @@ class ChangeYourBrainStateControl( object ):
     def win_keyboard_input(self,key_ID):
         #note: each key has 2 IDs because of Num Lock
         if self.experiment_state == BASELINE_CONFIRMATION:
-            if not self.baseline_confirmed:
+            if not self.baseline_confirmation:
                 if key_ID in [96,45]: #zero
                     print 'baseline disconfirmed'
-                    self.start_baseline_instructions()
+                    self.baseline_confirmation = -1
                 elif key_ID in [97,35]: #one
                     print 'baseline confirmed'
-                    self.baseline_confirmed = True
+                    self.baseline_confirmation = 1
             elif not self.question_answer:
                 if key_ID in [97,35]: 
                     self.question_answer = 1
@@ -393,13 +400,13 @@ class ChangeYourBrainStateControl( object ):
                 elif key_ID in [105,33]: 
                     self.question_answer = 9
         elif self.experiment_state == CONDITION_CONFIRMATION:
-            if not self.condition_confirmed:
+            if not self.condition_confirmation:
                 if key_ID in [96,45]: #zero
                     print 'condition disconfirmed'
-                    self.start_condition_instructions()
+                    self.condition_confirmation = -1
                 elif key_ID in [97,35]: #one
                     print 'condition confirmed'
-                    self.condition_confirmed = True
+                    self.condition_confirmation = 1
             elif not self.question_answer:
                 if key_ID in [97,35]: 
                     self.question_answer = 1
@@ -474,7 +481,11 @@ class FakeKeyboardInput ( threading.Thread ):
 
     def run ( self ):
         while True: #send 1,2,3 in a loop
-            for k in xrange(97,100): 
+            if random.random() < .5:
+                self.state_control.win_keyboard_input(96)
+            else:
+                self.state_control.win_keyboard_input(97)
+            for k in xrange(96,100): 
                 self.state_control.win_keyboard_input(k)
                 time.sleep(1)
 
