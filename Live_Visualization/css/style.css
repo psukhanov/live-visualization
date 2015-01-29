@@ -152,6 +152,8 @@ circle {
 
 .widget>header h4 {
   font-size: 28px;
+  text-align: center;
+  line-height: 125%;
 }
 
 .radar-chart .axis .legend {
@@ -203,6 +205,6 @@ text .middle {
 }
 
 .box h4 {
-  font-size: 32px;
+  font-size: 36px;
   font-style: bold;
 }
