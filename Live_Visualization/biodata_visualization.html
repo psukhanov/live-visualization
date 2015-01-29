@@ -152,18 +152,18 @@
                     <div class="col-md-4">
                         <div class="box">
                             <div class="big-text" id="hrv_change">
-                                33% increase
+                                New User
                             </div>
                             <div class="description">
-                                Heart Rate Variability
+                                swipe RFID to begin
                             </div>
                         </div>
-                        <div class="box">
-                            <div class="big-text" id="alpha_change">
-                                55% decrease
-                            </div>
+                        <div class="box" style="height: 500px">
+                            <h4>
+                                Understanding your scores
+                            </h4>
                             <div class="description">
-                                EEG Alpha
+                                more info here
                             </div>
                         </div>
                     </div>
@@ -231,7 +231,7 @@
                 series: [{
                     color: "rgb(207, 109, 81)",
                     data: [],
-                    name: "ECG - Heart rate variability"
+                    name: "ECG - Heart rate variability (HRV)"
                 }]
             });
             // a = [{x: 1, y: 2}, {x: 12, y: 13}];
@@ -245,12 +245,12 @@
                 series: [{
                     color: 'steelblue',
                      data: [],
-                     name: "EEG - baseline"
+                     name: "EEG alpha - condition"
                     },
                     {
                     color: 'black',
                      data: [],
-                     name: "ECG - baseline"
+                     name: "EEG alpha - baseline"
                     }
                     ]
             });
@@ -263,12 +263,12 @@
                 series: [{
                     color: "rgb(207, 109, 81)",
                     data: [],
-                    name: "ECG - Heart Rate Variability"
+                    name: "ECG HRV - condition"
                 },
                 {
                     color: 'black',
                     data: [],
-                    name: "ECG - baseline"
+                    name: "ECG HRV - baseline"
                     }]
             });
             make_axes();

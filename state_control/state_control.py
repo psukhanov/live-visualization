@@ -45,10 +45,10 @@ class ChangeYourBrainStateControl( object ):
 
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
-        #self.kInputThread = WindowsKeyboardInput(self)
-        #self.kInputThread.start()
-        self.kInputThread = FakeKeyboardInput(self)
+        self.kInputThread = WindowsKeyboardInput(self)
         self.kInputThread.start()
+        # self.kInputThread = FakeKeyboardInput(self)
+        # self.kInputThread.start()
 
         self.alpha_buffer = []
         self.hrv_last = 0
@@ -59,23 +59,10 @@ class ChangeYourBrainStateControl( object ):
     def process_eeg_alpha(self,value):
         arrValue = value.split(',')
         self.alpha_buffer.append(arrValue)
-        #print('process_eeg_alpha called')
+        # print('process_eeg_alpha called')
         ### make sure buffer gets clear when no subjects
         ### log data
         
-    def process_ecg(self,lead_on,hrv):
-        #devNote: for moment, assuming we're definitely getting only (LED,HRV) values. in future 1st int may indicate lead on/off X values to expect
-        if self.experiment_state == NO_EXPERIMENT:
-            pass
-        elif self.experiment_state == SETUP_INSTRUCTIONS:
-            pass
-        elif self.experiment_state == BASELINE_INSTRUCTIONS:
-            if hrv:
-                self.hrv_last = hrv
-        ### log data
-        self.hrv_save['time'].append(time.time())
-
-
     def tag_in(self,muse_id='0000'):
         #devNote: put here possible confirmation of user change if in middle of experiment
         self.start_setup_instructions()
@@ -303,6 +290,8 @@ class ChangeYourBrainStateControl( object ):
             alpha_out = random.random()
         self.alpha_buffer = []
 
+        self.hrv_save['time'].append(time.time())
+        self.hrv_save['value'].append(self.ecg.get_hrv())
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
@@ -321,14 +310,15 @@ class ChangeYourBrainStateControl( object ):
             condition_hrv = self.hrv_save['value'][-1]
         else:
             condition_hrv = 0 ### change me
+            print 'no hrv collected for condition!'
 
         value_out = {"instruction_name":"POST_EXPERIMENT",
                     "baseline_hrv": self.baseline_hrv,
                     "baseline_alpha": self.baseline_alpha,
-                    "baseline_subj": [4,3,2,1],
+                    "baseline_subj": self.condition_subj,
                     "condition_hrv": condition_hrv,
                     "condition_alpha": condition_alpha,
-                    "condition_subj": [1,2,3,4]}
+                    "condition_subj": self.condition_subj}
         message = {"message": { 
              "value": value_out,
              "type": "string", "name": "instruction", "clientName": self.client_name}}
@@ -483,9 +473,8 @@ class FakeKeyboardInput ( threading.Thread ):
         pass
 
     def run ( self ):
-        while True:
-            for k in xrange(97,101):
-                print k
+        while True: #send 1,2,3 in a loop
+            for k in xrange(97,100): 
                 self.state_control.win_keyboard_input(k)
                 time.sleep(1)
 

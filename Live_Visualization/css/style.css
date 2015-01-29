@@ -201,3 +201,8 @@ text .middle {
   bottom: 20px;
   font-size: 18px;
 }
+
+.box h4 {
+  font-size: 32px;
+  font-style: bold;
+}
