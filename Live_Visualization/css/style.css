@@ -109,7 +109,7 @@ circle {
 }
 
 .widget #instructions {
-  font-size: 36px;
+  font-size: 44px;
   line-height: 2.0;
 }
 
@@ -207,4 +207,19 @@ text .middle {
 .box h4 {
   font-size: 36px;
   font-style: bold;
+}
+
+#bar-legend {
+  position: absolute;
+  top:5px;
+  right: 20px;
+  font-size: 20px;
+}
+
+.widget #baseline-radar {
+  color: rgba(220,220,220,0.5);
+}
+
+.widget #condition-radar {
+  color: rgba(151,187,205,1);
 }
