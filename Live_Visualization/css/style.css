@@ -223,3 +223,15 @@ text .middle {
 .widget #condition-radar {
   color: rgba(151,187,205,1);
 }
+/*
+.widget #canvas {
+  width: 300px;
+}*/
+
+#barchart1 {
+  margin-top: 50px;
+}
+
+#hrv-change, #new-user-description {
+  font-color: #e5603b;
+}

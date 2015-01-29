@@ -23,42 +23,44 @@ var museConnection = function () {
 
 // Results Page Charts
 // TODO: Lincoln - get real data to fill data arr
-var randomScalingFactor = function() {
-        return Math.round(Math.random()*100)
-};
+// var randomScalingFactor = function() {
+//         return Math.round(Math.random()*100)
+// };
 
-var barChartData = {
-    labels : ["Average HRV","Average Alpha EEG"],
-    datasets : [
-        {
-            fillColor : "rgba(220,220,220,0.5)",
-            strokeColor : "rgba(220,220,220,0.8)",
-            highlightFill: "rgba(220,220,220,0.75)",
-            highlightStroke: "rgba(220,220,220,1)",
-            data : [randomScalingFactor(),randomScalingFactor()]
-        },
-        {
-            fillColor : "rgb(234, 200, 94)",
-            strokeColor : "rgb(234, 200, 98)",
-            highlightFill : "#eac85e",
-            highlightStroke : "#eac85e",
-            // highlightStroke : "rgba(151,187,205,1)",
-            data : [randomScalingFactor(),randomScalingFactor()]
-        }
-    ]
+// var barChartData = {
+//     labels : ["Average HRV","Average Alpha EEG"],
+//     datasets : [
+//         {
+//             fillColor : "rgba(220,220,220,0.5)",
+//             strokeColor : "rgba(220,220,220,0.8)",
+//             highlightFill: "rgba(220,220,220,0.75)",
+//             highlightStroke: "rgba(220,220,220,1)",
+//             data : [randomScalingFactor(),randomScalingFactor()]
+//         },
+//         {
+//             fillColor : "rgb(234, 200, 94)",
+//             strokeColor : "rgb(234, 200, 98)",
+//             highlightFill : "#eac85e",
+//             highlightStroke : "#eac85e",
+//             // highlightStroke : "rgba(151,187,205,1)",
+//             data : [randomScalingFactor(),randomScalingFactor()]
+//         }
+//     ]
 
-}
+// }
 
 function setBarChartData(data){
   var barChartData = {
-    labels : ["Average HRV","Average Alpha EEG"],
+    // labels : ["Average HRV","Average Alpha EEG"],
+    labels : ["Average HRV"],
     datasets : [
         {
             fillColor : "rgba(220,220,220,0.5)",
             strokeColor : "rgba(220,220,220,0.8)",
             highlightFill: "rgba(220,220,220,0.75)",
             highlightStroke: "rgba(220,220,220,1)",
-            data : [data[0],data[1]]
+            // data : [data[0],data[1]]
+            data : [data[0]]
         },
         {
             fillColor : "rgb(234, 200, 94)",
@@ -66,24 +68,66 @@ function setBarChartData(data){
             highlightFill : "#eac85e",
             highlightStroke : "#eac85e",
             // highlightStroke : "rgba(151,187,205,1)",
-            data : [data[2],data[3]]
+            data : [data[1]]
         }
     ]
   }
     return barChartData;
 }
+
+// Second barchart
+function setSecondChartData(data) {
+  var barChartData = {
+    labels : ["Average Alpha EEG"],
+    datasets : [
+        {
+            fillColor : "rgba(220,220,220,0.5)",
+            strokeColor : "rgba(220,220,220,0.8)",
+            highlightFill: "rgba(220,220,220,0.75)",
+            highlightStroke: "rgba(220,220,220,1)",
+            // data : [data[0],data[1]]
+            data : [data[2]]
+        },
+        {
+            fillColor : "rgb(234, 200, 94)",
+            strokeColor : "rgb(234, 200, 98)",
+            highlightFill : "#eac85e",
+            highlightStroke : "#eac85e",
+            // highlightStroke : "rgba(151,187,205,1)",
+            data : [data[3]]
+        },
+    ]
+  }
+    return barChartData;
+}
+
 function drawBarChart (data){
 
     var barChartData = setBarChartData(data);
-    var ctx = document.getElementById("canvas").getContext("2d");
+    var ctx = document.getElementById("canvas1").getContext("2d");
     window.myBar = new Chart(ctx).Bar(barChartData, {
-        responsive : true,
+        // responsive : true,
         // scaleShowGridLines : false,
-        scaleFontSize: 32,
+        scaleFontSize: 22,
         scaleFontColor: "#FFF",
         scaleFontFamily: "'Open Sans',sans-serif;",
         scaleLineColor: "#FFF",
+        showTooltips: false,
     });
+
+    // second chart
+    var secondChartData = setSecondChartData(data);
+    var newctx = document.getElementById("canvas2").getContext("2d");
+    var options = {
+        // responsive : true,
+        scaleFontSize: 22,
+        scaleFontColor: "#FFF",
+        scaleFontFamily: "'Open Sans',sans-serif;",
+        scaleLineColor: "#FFF",
+        showTooltips: false,
+    }
+    var testBar = new Chart(newctx).Bar(secondChartData, options);
+
 }
 
 //  console.log("myBar:" + window.myBar)
@@ -128,13 +172,15 @@ function drawRadarChart(before_data,after_data){
   var legendTemplate  = "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].lineColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
 
   var myRadarChart = new Chart(ctx).Radar(radarData, {
-        responsive : true,
+        // responsive : true,
         // scaleShowGridLines : false,
+        scaleFontSize: 32,
         pointLabelFontSize: 32,
         pointLabelFontColor: "#FFF",
         pointLabelFontFamily: "'Open Sans',sans-serif;",
         angleLineColor: "#FFF",
-        legendTemplate : legendTemplate
+        legendTemplate : legendTemplate,
+        showTooltips: false,
     }
   );
 
@@ -145,7 +191,7 @@ RadarChart.defaultConfig.color = function() {};
 RadarChart.defaultConfig.radius = 3;
 
 // TODO: Lincoln - radar data
-/*var data = 
+/*var data =
   {
     className: 'before', // optional can be used for styling
     axes: [
