@@ -198,13 +198,16 @@ class ecg_fake():
 
     def __init__(self):
         self.lead_count = 0
+        self.cur_lead_on = False
 
     def is_lead_on(self):
         self.lead_count += 1
         if self.lead_count > 5:
+            self.cur_lead_on = True
             print 'lead on'
             return True
         else:
+            self.cur_lead_on = False
             print 'lead off'
             return False
 
@@ -253,6 +256,11 @@ class ecg_real(object):
                 sample_count+=1
                 D = self.nskECG.popBuffer() #get the oldest dict
 
+                if D['leadoff']==200:
+                    self.cur_lead_on = True #lead is on
+                else:
+                    self.cur_lead_on = False # no connection between leads
+
                 # if we are more than 2 seconds in and leadoff is still zero
                 if D['leadoff']==0:
                     leadoff_count+=1
@@ -267,7 +275,7 @@ class ecg_real(object):
 
                 D = self.nskECG.ecgalgAnalyzeRaw(D)
 
-                self.cur_lead_on = D['leadoff']
+                
                 if 'hrv' in D:
                     self.cur_hrv = D['hrv']
                     self.cur_hrv_t = D['timestamp']
@@ -330,7 +338,7 @@ if __name__ == "__main__":
     global sb_server_2 # used for sending out instructions & processed EEG/ECG to the viz
     sb_server_2 = SpacebrewServer(server='127.0.0.1',port=9002,muse_ids=['booth-7'])
 
-    print 'hello world 1'
+    print 'Started SpaceBrew server: instructions and processed EEG/ECG'
 
     global sb_client
     args = parser.parse_args()
@@ -348,32 +356,36 @@ if __name__ == "__main__":
     else:
         ecg = ecg_fake()
 
-    print 'hello world 2'
+    print 'Started SpaceBrew Client & Listener thread'
 
     #file_dir = os.path.dirname(os.path.realpath(__file__))
 
     #hard-coding is bad! Somebody who knows python please find this file the right way
 
-    print 'hello world 3'
+    print 'Loading Chrome on platform: ', sys.platform
 
     if sys.platform == 'win32': #windoze
         chrome_path = 'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe %s'
+        webbrowser.open(biodata_viz_url)
     elif sys.platform == 'darwin': # MAC OSX
         chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+        webbrowser.get(chrome_path).open(biodata_viz_url)
     else: # Linux
         chrome_path = '/usr/bin/google-chrome %s'
+        webbrowser.get(chrome_path).open(biodata_viz_url)
+    print 'Chrome Loaded'
 
     print 'hello world 4'
 
     # webbrowser.get(chrome_path).open(biodata_viz_url)
-    webbrowser.open(biodata_viz_url)
+    # webbrowser.open(biodata_viz_url)
     #time.sleep(4)
 
     # uncomment next line to run full timing
     sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
     # uncomment the next line to run expidited timing (DO NOT CHANGE VALUES)
     # sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
-    print 'hello world 5'
+    print 'ChangeYourBrain state engine started, beginning protocol.'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
     if (eeg_source == 'real'):
