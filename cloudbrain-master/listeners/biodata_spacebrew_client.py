@@ -2,8 +2,8 @@
 import sys, random
 import argparse
 from os.path import dirname, abspath
-
-sys.path.insert(0, dirname(dirname(abspath(__file__))))
+import os
+sys.path.insert(0, abspath(".."))
 import settings
 from spacebrew.spacebrew import SpacebrewApp
 import json
@@ -18,11 +18,11 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_source = "real" #fake or real
-# eeg_source = "fake" #fake or real
+# eeg_source = "real" #fake or real
+eeg_source = "fake" #fake or real
 
-ecg_source = "real" #fake or real
-# ecg_source = "fake" #fake or real
+# ecg_source = "real" #fake or real
+ecg_source = "fake" #fake or real
 
 if eeg_source == "real":
     serverName = "server.neuron.brain"
@@ -34,10 +34,12 @@ else:
 eeg_connect_string = "connect"
 eeg_disconnect_string = "disconnect"
 
-
-
+base_path = abspath("../..")
+biodata_viz_url = base_path + "/Live_Visualization/biodata_visualization.html"
+print biodata_viz_url
+#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 #biodata_viz_url = 'file:///Users/paulsukhanov/Desktop/Explorabrainium/live-visualization-master/Live_Visualization/biodata_visualization.html'
-biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
+#biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
 
 class SpacebrewClient(object):
     def __init__(self, name, server='127.0.0.1', port=9000):
@@ -361,8 +363,8 @@ if __name__ == "__main__":
 
     print 'hello world 4'
 
-    #webbrowser.get(chrome_path).open(biodata_viz_url)
-    webbrowser.open(biodata_viz_url)
+    webbrowser.get(chrome_path).open(biodata_viz_url)
+    #webbrowser.open(biodata_viz_url)
     #time.sleep(4)
 
     # uncomment next line to run full timing

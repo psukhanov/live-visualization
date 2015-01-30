@@ -4,9 +4,12 @@ import threading
 from threading import Timer
 import time
 import json
-import pyHook #for universal keyboard input
-import pythoncom
 import random
+import sys
+
+if sys.platform == 'win32': #windoze
+    import pyHook #for universal keyboard input
+    import pythoncom
 
 #EXPERIMENT STATE CODES
 NO_EXPERIMENT = 0
@@ -43,10 +46,12 @@ class ChangeYourBrainStateControl( object ):
 
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
-        self.kInputThread = WindowsKeyboardInput(self)
-        self.kInputThread.start()
-        # self.kInputThread = FakeKeyboardInput(self)
-        # self.kInputThread.start()
+        if sys.platform == 'win32': #windoze
+            self.kInputThread = WindowsKeyboardInput(self)
+            self.kInputThread.start()
+        else:
+            self.kInputThread = FakeKeyboardInput(self)
+            self.kInputThread.start()
 
         self.alpha_buffer = []
         self.hrv_last = 0
