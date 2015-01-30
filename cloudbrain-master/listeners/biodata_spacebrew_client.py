@@ -368,9 +368,9 @@ if __name__ == "__main__":
     #time.sleep(4)
 
     # uncomment next line to run full timing
-    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
+    # sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
     # uncomment the next line to run expidited timing (DO NOT CHANGE VALUES)
-    # sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
+    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
     print 'hello world 5'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
