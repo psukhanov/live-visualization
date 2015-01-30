@@ -277,7 +277,7 @@ class ChangeYourBrainStateControl( object ):
             self.alpha_save_baseline['time'].append(time.time())
             self.alpha_save_baseline['value'].append(alpha_out)
         else: 
-            alpha_out = random.random() ###
+            alpha_out = 0 # random.random() ###
             print 'baseline: alpha_buffer empty!'
         self.alpha_buffer = []
 
