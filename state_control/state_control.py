@@ -136,6 +136,7 @@ class ChangeYourBrainStateControl( object ):
         self.baseline_confirmation = 0 #confirmed = 1, disconfirmed = -1
         self.output_instruction('CONFIRMATION')
         while not self.baseline_confirmation: #neither confirmed nor disconfirmed
+            self.check_ecg_lead() #should turn on ECG cconnection 
             continue
         if self.baseline_confirmation < 0: 
             self.start_baseline_instructions()
@@ -214,6 +215,7 @@ class ChangeYourBrainStateControl( object ):
         self.condition_confirmation = 0 #confirmed = 1, disconfirmed = -1
         self.output_instruction('CONFIRMATION')
         while not self.condition_confirmation: #neither confirmed nor disconfirmed
+            self.check_ecg_lead() #should turn on ECG cconnection 
             continue
         if self.condition_confirmation < 0: 
             self.start_condition_instructions()
