@@ -44,6 +44,7 @@ class ChangeYourBrainStateControl( object ):
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
         self.kInputThread = WindowsKeyboardInput(self)
+        self.kInputThread.daemon = True;
         self.kInputThread.start()
         # self.kInputThread = FakeKeyboardInput(self)
         # self.kInputThread.start()

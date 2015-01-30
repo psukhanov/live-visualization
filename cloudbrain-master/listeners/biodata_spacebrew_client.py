@@ -91,8 +91,8 @@ class SpacebrewClient(object):
             #self.brew.add_subscriber(spacebrew_name, "string")
             #self.brew.subscribe(spacebrew_name, self.handle_value)
 
-        self.brew.add_publisher("eeg_ecg","string")
-        self.brew.add_publisher("instruction","string")
+        #self.brew.add_publisher("eeg_ecg","string")
+        #self.brew.add_publisher("instruction","string")
         self.brew.add_subscriber("alpha_absolute","string")
         self.brew.add_subscriber(eeg_connect_string,"string")
         self.brew.add_subscriber(eeg_disconnect_string,"string")
@@ -320,6 +320,7 @@ if __name__ == "__main__":
     sb_server = SpacebrewServer(muse_ids=['fake-muse'], server='127.0.0.1') #simulating data coming in from our user's muse
 
     serverThread = ServerThread()
+    serverThread.daemon = True;
 
     if eeg_source == 'fake':
         serverThread.start()
@@ -334,6 +335,7 @@ if __name__ == "__main__":
     sb_client = SpacebrewClient('booth-%s' % args.name, server=serverName,port=port_no) #in production, this will be set to server.neuron.brain
 
     listenerThread = ListenerThread()
+    listenerThread.daemon = True;
     listenerThread.start()
 
     if (ecg_source == 'real'):
@@ -373,9 +375,9 @@ if __name__ == "__main__":
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
     if (eeg_source == 'real'):
-        time.sleep(4)
-        sc.tag_in()
-        # sb_client.set_handle_value(eeg_connect_string,sc.tag_in)
+        #time.sleep(4)
+        #sc.tag_in()
+        sb_client.set_handle_value(eeg_connect_string,sc.tag_in)
     else:
         time.sleep(4)
         sc.tag_in()
