@@ -46,11 +46,14 @@ class ChangeYourBrainStateControl( object ):
 
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
+
         if sys.platform == 'win32': #windoze
             self.kInputThread = WindowsKeyboardInput(self)
+            self.kInputThread.daemon = True;
             self.kInputThread.start()
         else:
             self.kInputThread = FakeKeyboardInput(self)
+            self.kInputThread.daemon = True;
             self.kInputThread.start()
 
         self.alpha_buffer = []
@@ -238,18 +241,18 @@ class ChangeYourBrainStateControl( object ):
 
     def output_instruction(self,sub_state=None):
         if self.experiment_state == SETUP_INSTRUCTIONS:
-            instruction_text = 'This booth requires approximately a three minute commitment. To continue, put on headphones, and place hands on sensors to begin'
+            instruction_text = 'This booth requires approximately a three minute commitment. To begin, sit down, put on headphones, and place hands on sensors.'
         elif self.experiment_state == BASELINE_INSTRUCTIONS:
             instruction_text = 'Give us 30 seconds to calibrate to your brain and body. Please stay still and silent, keeping your hands on the sensors.'
         elif self.experiment_state == CONDITION_INSTRUCTIONS:
-            instruction_text = 'In this practice, you will slow your breath to one breath every 8 seconds. Follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.'
+            instruction_text = 'In this practice, you will slow your breath to one breath every 8 seconds. Return your hands to the sensors and follow the inhalation/exhalation visual as closely as possible. As the circle expands, breathe in. As it shrinks breathe out.'
         elif self.experiment_state in [CONDITION_CONFIRMATION,BASELINE_CONFIRMATION]:
             if sub_state == "CONFIRMATION" and self.experiment_state == BASELINE_CONFIRMATION:
                 instruction_text = "Did you stay still and silent successfully during the calibration? Type \'1\' for yes and \'0\' for no."
             elif sub_state == "CONFIRMATION" and self.experiment_state == CONDITION_CONFIRMATION:
-                instruction_text = "Did you complete the exercise correctly? Type \'1\' for yes and \'0\' for no."
+                instruction_text = "Did you complete the exercise correctly? You may remove your left hand from the sensor and type \'1\' for yes and \'0\' for no."
             elif sub_state == "Q1":
-                instruction_text = "How calm do you feel? type a number between 1 (not at all) and 9 (very)"
+                instruction_text = "How calm do you feel? Type a number between 1 (not at all) and 9 (very)"
             elif sub_state == "Q2":
                 instruction_text = 'How content are you? (1-9)'
             elif sub_state == "Q3":
