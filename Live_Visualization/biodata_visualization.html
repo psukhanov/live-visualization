@@ -56,7 +56,7 @@
                     <div class="col-lg-8">
                         <section class="widget">
                             <header>
-                                <h4>EEG Baseline Collection</h4>
+                                <h4>EEG Basline Collection</h4>
                             </header>
                             <div class="histogram">
                                 <div id="eeg_graph_baseline"></div>
@@ -66,7 +66,7 @@
                         </section>
                         <section class="widget">
                             <header>
-                                <h4>ECG Baseline Collection</h4>
+                                <h4>Heart Rate Variability (HRV) Baseline Collection</h4>
                             </header>
                             <div class="histogram">
                                 <div id="ecg_graph_baseline"></div>
@@ -94,7 +94,7 @@
                     <div class="col-lg-8">
                         <section class="widget">
                             <header>
-                                <h4>Baseline vs Actual</h4>
+                                <h4>Current EEG Alpha vs Baseline Average</h4>
                             </header>
                             <div class="histogram">
                                 <div id="eeg_graph_condition"></div>
@@ -104,7 +104,7 @@
                         </section>
                         <section class="widget">
                             <header>
-                                <h4>ECG Readings
+                                <h4>Current ECG Heart Rate Variability vs Baseline
                                     <!-- <small>Real-time Plot</small> -->
                                 </h4>
                             </header>
@@ -174,12 +174,12 @@
                                 </h4>
                             </header>
                             <div class="description">
-                                Stronger alpha frequency band (4-8hz) power and larger variability in heart rate (HRV) may each indicate greater states of relaxation and well being.  Did yours increase or decrease with the breathing exercise, compared to baseline? 
+                                Stronger alpha frequency band (8-14 Hz) power and larger variability in heart rate (HRV) may each indicate greater states of relaxation and well being.  Did yours increase or decrease with the breathing exercise, compared to baseline? 
                             </div>
                         </section>
                         <section class="widget">
                             <div class="description">
-                                Email <u>change.brain.exploratorium@gmail.com</u> with questions or feedbak.
+                                Email <u>change.brain.exploratorium@gmail.com</u> with questions or feedback.
                             </div>
                         </section>
                         <!-- </div> -->
@@ -521,7 +521,7 @@ else if (instruction.instruction_name == "DISCONNECTED")
 	}
 	else if (instruction.type == "ecg")
 	{
-		$("#ecg_state").html( eeg_disconnected_text );
+		$("#ecg_state").html( ecg_disconnected_text );
 	}
 
 }
