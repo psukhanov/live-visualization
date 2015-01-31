@@ -46,15 +46,19 @@ class ChangeYourBrainStateControl( object ):
 
         # self.kInputThread = ConsoleKeyboardInputThread()
         # self.kInputThread.start()
+
         if sys.platform == 'win32': #windoze
             self.kInputThread = WindowsKeyboardInput(self)
+            self.kInputThread.daemon = True;
             self.kInputThread.start()
         else:
             self.kInputThread = FakeKeyboardInput(self)
+            self.kInputThread.daemon = True;
             self.kInputThread.start()
 
         self.alpha_buffer = []
         self.hrv_last = 0
+        self.ecg_leadon = False #start with lead off as current state
 
         ### start / reset a whole uptime timer 
 
@@ -65,7 +69,24 @@ class ChangeYourBrainStateControl( object ):
         # print('process_eeg_alpha called')
         ### make sure buffer gets clear when no subjects
         ### log data
-        
+
+    def check_ecg_lead(self):
+        """ check to see the current state of the ECG lead, and send a message if it changes """
+        if self.ecg.cur_lead_on != self.ecg_leadon: 
+            self.ecg_leadon = self.ecg.cur_lead_on
+            if self.ecg_leadon:
+                instruction = {"message": {
+                    "value" : {'instruction_name': 'CONNECTED', 'type': 'ecg'},
+                    "type": "string", "name": "instruction", "clientName": self.client_name}}
+                print "ECG CONNECTED" #^^^
+            else:    
+                instruction = {"message": {
+                    "value" : {'instruction_name': 'DISCONNECTED', 'type': 'ecg'},
+                    "type": "string", "name": "instruction", "clientName": self.client_name}}
+                print "ECG DISCONNECTED" #^^^
+            self.sb_server.ws.send(json.dumps(instruction))
+
+
     def tag_in(self,muse_id='0000'):
         #devNote: put here possible confirmation of user change if in middle of experiment
         self.start_setup_instructions()
@@ -115,6 +136,7 @@ class ChangeYourBrainStateControl( object ):
         self.baseline_confirmation = 0 #confirmed = 1, disconfirmed = -1
         self.output_instruction('CONFIRMATION')
         while not self.baseline_confirmation: #neither confirmed nor disconfirmed
+            self.check_ecg_lead() #should turn on ECG cconnection 
             continue
         if self.baseline_confirmation < 0: 
             self.start_baseline_instructions()
@@ -193,6 +215,7 @@ class ChangeYourBrainStateControl( object ):
         self.condition_confirmation = 0 #confirmed = 1, disconfirmed = -1
         self.output_instruction('CONFIRMATION')
         while not self.condition_confirmation: #neither confirmed nor disconfirmed
+            self.check_ecg_lead() #should turn on ECG cconnection 
             continue
         if self.condition_confirmation < 0: 
             self.start_condition_instructions()
@@ -274,7 +297,7 @@ class ChangeYourBrainStateControl( object ):
             self.alpha_save_baseline['time'].append(time.time())
             self.alpha_save_baseline['value'].append(alpha_out)
         else: 
-            alpha_out = random.random() ###
+            alpha_out = 0 # random.random() ###
             print 'baseline: alpha_buffer empty!'
         self.alpha_buffer = []
 
@@ -351,11 +374,13 @@ class ChangeYourBrainStateControl( object ):
         g = g_tick()
         while self.experiment_state == state:
             time.sleep(g.next())
+            self.check_ecg_lead() #check the ECG lead here
             f(*args)
 
     def start_on_lead(self):
         if self.ecg.is_lead_on():
-            self.start_baseline_instructions()
+            self.check_ecg_lead() #should turn on ECG cconnection 
+            self.start_baseline_instructions() # and then start the state engine
 
     def keyboard_input(self):
         #devNote: could do this smarter by not calling this function unless in one of the appropriate states
