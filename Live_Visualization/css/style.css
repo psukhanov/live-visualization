@@ -70,6 +70,14 @@ span {
   margin: 5px auto;
 }
 
+#histogram_condition {
+  display: inline-block;
+  width: 400px;
+  height: 300px;
+  margin: 5px auto;
+}
+
+
 #axis0 {
   position: absolute;
   top: 0;
@@ -99,8 +107,8 @@ circle {
 }
 
 #bloom {
-  height: 325px;
-  margin: 15px auto;
+  height: 400px;
+  margin: 0px auto;
 }
 
 
@@ -162,8 +170,8 @@ circle {
 
 #eeg_legend_baseline, #ecg_legend_baseline, #eeg_legend_condition, #ecg_legend_condition {
   position: absolute;
-  top: 30px;
-  right: 40px;
+  bottom: 30px;
+  left: 40px;
 }
 
 text .middle {

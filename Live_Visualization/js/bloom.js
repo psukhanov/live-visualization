@@ -5,9 +5,9 @@ var margin = {
     // left: 120
 },
     // width = 960 - margin.left - margin.right,
-    width = 280,
+    width = 400,
     // height = 500 - margin.top - margin.bottom;
-    height = 280;
+    height = 400;
 
 var y = d3.scale.ordinal().domain(d3.range(1)).rangePoints([0, height]);
 
@@ -30,11 +30,11 @@ function pulse() {
     var circle = svg.select("circle");
     (function repeat() {
         circle = circle.transition()
-            .duration(4500)
+            .duration(4000)
             .attr("stroke-width", 20)
             .attr("r", 10)
             .transition()
-            .duration(4500)
+            .duration(4000)
             .attr('stroke-width', 0.5)
             .attr("r", 125)
             .ease('sine')

@@ -91,12 +91,12 @@
                 </div>
 
                 <div class="row section" id="section">
-                    <div class="col-lg-8">
+                    <div class="col-lg-6">
                         <section class="widget">
                             <header>
                                 <h4>Current EEG Alpha vs Baseline Average</h4>
                             </header>
-                            <div class="histogram">
+                            <div class="histogram_condition">
                                 <div id="eeg_graph_condition"></div>
                                 <div id="eeg_legend_condition"></div>
                                 <!-- </br></br> -->
@@ -108,14 +108,14 @@
                                     <!-- <small>Real-time Plot</small> -->
                                 </h4>
                             </header>
-                            <div class="histogram">
+                            <div class="histogram_condition">
                                 <div id="ecg_graph_condition"></div>
                                 <div id="ecg_legend_condition"></div>
                                 <!-- </br></br> -->
                             </div>
                         </section>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                         <section class="widget">
                             <header>
                                 <h4>
@@ -159,9 +159,9 @@
                     <div class="col-md-4">
                         <section class="widget">
                             <header>
-                                <h4>
+                                <h3>
                                     New User?
-                                </h4>
+                                </h3>
                             </header>
                             <div class="description" id="new-user-description">
                                 Swipe your RFID tag to begin.
@@ -169,9 +169,9 @@
                         </section>
                         <section class="widget">
                             <header>
-                                <h4>
+                                <h3>
                                     Understanding your scores
-                                </h4>
+                                </h3>
                             </header>
                             <div class="description">
                                 Stronger alpha frequency band (8-14 Hz) power and larger variability in heart rate (HRV) may each indicate greater states of relaxation and well being.  Did yours increase or decrease with the breathing exercise, compared to baseline? 
@@ -221,14 +221,17 @@
             // Spacebrew Object
             //set up graph & axes in Rickshaw
 
-            var graph_height = 250;
+            var graph_height_baseline = 250;
             // var graph_width = 500;
-            var graph_width = 620;
+            var graph_width_baseline = 620;
+
+            var graph_width_condition = 500;
+            var graph_height_condition = 250;
 
             var eeg_graph_baseline = new Rickshaw.Graph( {
                 element: document.querySelector("#eeg_graph_baseline"),
-                width: graph_width,
-                height: graph_height,
+                width: graph_width_baseline,
+                height: graph_height_baseline,
                 min: -1,
                 max: 1,
                 renderer: 'line',
@@ -241,8 +244,8 @@
 
             var ecg_graph_baseline = new Rickshaw.Graph( {
                 element: document.querySelector("#ecg_graph_baseline"),
-                width: graph_width,
-                height: graph_height,
+                width: graph_width_baseline,
+                height: graph_height_baseline,
                 renderer: 'line',
 
                 series: [{
@@ -254,8 +257,8 @@
             // a = [{x: 1, y: 2}, {x: 12, y: 13}];
             var eeg_graph_condition = new Rickshaw.Graph( {
                 element: document.querySelector("#eeg_graph_condition"),
-                width: graph_width,
-                height: graph_height,
+                width: graph_width_condition,
+                height: graph_height_condition,
                 renderer: 'line',
                 min: -1,
                 max: 1,
@@ -274,8 +277,8 @@
 
             var ecg_graph_condition = new Rickshaw.Graph( {
                 element: document.querySelector("#ecg_graph_condition"),
-                width: graph_width,
-                height: graph_height,
+                width: graph_width_condition,
+                height: graph_height_condition,
                 renderer: 'line',
                 series: [{
                     color: "rgb(207, 109, 81)",
