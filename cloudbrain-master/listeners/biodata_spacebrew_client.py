@@ -18,10 +18,10 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_source = "fake" #fake or real
+eeg_source = "real" #fake or real
 # eeg_source = "fake" #fake or real
 
-ecg_source = "fake" #fake or real
+ecg_source = "real" #fake or real
 # ecg_source = "fake" #fake or real
 
 if eeg_source == "real":
