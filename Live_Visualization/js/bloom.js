@@ -5,9 +5,9 @@ var margin = {
     // left: 120
 },
     // width = 960 - margin.left - margin.right,
-    width = 400,
+    width = 480,
     // height = 500 - margin.top - margin.bottom;
-    height = 400;
+    height = 480;
 
 var y = d3.scale.ordinal().domain(d3.range(1)).rangePoints([0, height]);
 
@@ -36,7 +36,7 @@ function pulse() {
             .transition()
             .duration(4000)
             .attr('stroke-width', 0.5)
-            .attr("r", 125)
+            .attr("r", width/2)
             .ease('sine')
             .each("end", repeat);
     })();

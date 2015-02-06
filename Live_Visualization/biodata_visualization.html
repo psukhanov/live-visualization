@@ -46,7 +46,7 @@
                             <header>
                                 <h4>Instructions</h4>
                             </header>
-                            <div id="instructions">"Please swipe your RFID tag to begin"</div>
+                            <div id="instructions">"Please tap your RFID tag to begin"</div>
                         </section>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                     <div class="col-lg-8">
                         <section class="widget">
                             <header>
-                                <h4>EEG Basline Collection</h4>
+                                <h4>EEG Baseline Collection</h4>
                             </header>
                             <div class="histogram">
                                 <div id="eeg_graph_baseline"></div>
@@ -163,9 +163,9 @@
                                     New User?
                                 </h3>
                             </header>
-                            <div class="description" id="new-user-description">
-                                Swipe your RFID tag to begin.
-                            </div>
+                            <h3 class="description" id="new-user-description">
+                                Tap your RFID tag to begin.
+                            </h3>
                         </section>
                         <section class="widget">
                             <header>
@@ -173,9 +173,9 @@
                                     Understanding your scores
                                 </h3>
                             </header>
-                            <div class="description">
+                            <h3 class="description">
                                 Stronger alpha frequency band (8-14 Hz) power and larger variability in heart rate (HRV) may each indicate greater states of relaxation and well being.  Did yours increase or decrease with the breathing exercise, compared to baseline? 
-                            </div>
+                            </h3>
                         </section>
                         <section class="widget">
                             <div class="description">
@@ -205,7 +205,7 @@
             var ecg_disconnected_text = "ECG: Not Connected";
             var eeg_connected_text = "EEG: Connected";
             var ecg_connected_text = "ECG: Connected";
-            var not_started_text = "Please swipe your RFID tag to begin.";
+            var not_started_text = "Please tap your RFID tag to begin.";
             // initialize program variables
             var eeg_state = "DISCONNECTED";
             var ecg_state = "DISCONNECTED";
@@ -225,8 +225,8 @@
             // var graph_width = 500;
             var graph_width_baseline = 620;
 
-            var graph_width_condition = 500;
-            var graph_height_condition = 250;
+            var graph_width_condition = 440;
+            var graph_height_condition = 220;
 
             var eeg_graph_baseline = new Rickshaw.Graph( {
                 element: document.querySelector("#eeg_graph_baseline"),
