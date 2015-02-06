@@ -3,7 +3,8 @@ import sys, random
 import argparse
 from os.path import dirname, abspath
 import os
-sys.path.insert(0, abspath(".."))
+#sys.path.insert(0, abspath(".."))
+sys.path.insert(0, abspath("cloudbrain-master"))
 import settings
 from spacebrew.spacebrew import SpacebrewApp
 import json
@@ -24,6 +25,9 @@ eeg_source = "real" #fake or real
 ecg_source = "real" #fake or real
 # ecg_source = "fake" #fake or real
 
+timing = "live" #for full timing as in exploratorium visitor mode
+#timing = "debug" #for quick debug timing
+
 if eeg_source == "real":
     serverName = "server.neuron.brain"
     port_no = 9000
@@ -34,7 +38,8 @@ else:
 eeg_connect_string = "connect"
 eeg_disconnect_string = "disconnect"
 
-base_path = abspath("../..")
+#base_path = abspath("../..")
+base_path = abspath(".")
 biodata_viz_url = base_path + "/Live_Visualization/biodata_visualization.html"
 print biodata_viz_url
 #biodata_viz_url = 'file:///C:/Users/ExplorCogTech/src/live-visualization/Live_Visualization/biodata_visualization.html'
@@ -137,9 +142,6 @@ class SpacebrewClient(object):
     def start(self):
         self.brew.start()
 
-    def tag_in():
-        print 'tagged in'
-
 class SpacebrewServer(object):
     def __init__(self, muse_ids=['fake-muse'], server='127.0.0.1', port=9000):
         self.server = server
@@ -185,14 +187,11 @@ class SpacebrewServer(object):
                     metric = path['address'].split('/')[-1]
                     nb_args = path['arguments']
 
-                    value = "%s,%s,%s,%s,%s" % (random.random(),random.random(),random.random(),random.random(), time_stamp)
-
+                    value = "%s,%s,%s,%s,%s,%s" % (random.random(),random.random(),random.random(),random.random(), time_stamp, time_stamp)
                     message = {"message": {
                         "value": value,
                         "type": "string", "name": metric, "clientName": muse_id}}
                     self.ws.send(json.dumps(message))
-
-
 
 class ecg_fake():
 
@@ -212,6 +211,9 @@ class ecg_fake():
             return False
 
     def get_hrv(self):
+        return random.random()
+
+    def get_hrv_t(self):
         return random.random()
 
 class ecg_real(object):
@@ -290,7 +292,13 @@ class ecg_real(object):
         if self.cur_hrv:
             return self.cur_hrv
         else:
-            return 0
+            return -1
+
+    def get_hrv_t(self):
+        if self.cur_hrv_t:
+            return self.cur_hrv_t
+        else:
+            return -1
 
 class ServerThread ( threading.Thread ):
 
@@ -326,13 +334,12 @@ if __name__ == "__main__":
 
     print 'servername: %s' % serverName
 
-    global sb_server #Not sure if this needs to be a global or can be made a property of a biodata_client class
-    sb_server = SpacebrewServer(muse_ids=['fake-muse'], server='127.0.0.1') #simulating data coming in from our user's muse
-
-    serverThread = ServerThread()
-    serverThread.daemon = True;
-
     if eeg_source == 'fake':
+        global sb_server #Not sure if this needs to be a global or can be made a property of a biodata_client class
+        sb_server = SpacebrewServer(muse_ids=['fake-muse'], server='127.0.0.1') #simulating data coming in from our user's muse
+
+        serverThread = ServerThread()
+        serverThread.daemon = True;
         serverThread.start()
 
     global sb_server_2 # used for sending out instructions & processed EEG/ECG to the viz
@@ -382,9 +389,11 @@ if __name__ == "__main__":
     #time.sleep(4)
 
     # uncomment next line to run full timing
-    sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
+    if timing == "live":
+        sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 30, condition_sec = 90, baseline_inst_sec = 6, condition_inst_sec = 9)
     # uncomment the next line to run expidited timing (DO NOT CHANGE VALUES)
-    # sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
+    elif timing == "debug":
+        sc = ChangeYourBrainStateControl(sb_client.client_name, sb_server_2, ecg=ecg, vis_period_sec = .25, baseline_sec = 5, condition_sec = 5, baseline_inst_sec = 2, condition_inst_sec = 2)
     print 'ChangeYourBrain state engine started, beginning protocol.'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
