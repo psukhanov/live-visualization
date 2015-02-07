@@ -19,14 +19,14 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-eeg_source = "real" #fake or real
-# eeg_source = "fake" #fake or real
+# eeg_source = "real" #fake or real
+eeg_source = "fake" #fake or real
 
-ecg_source = "real" #fake or real
-# ecg_source = "fake" #fake or real
+# ecg_source = "real" #fake or real
+ecg_source = "fake" #fake or real
 
-timing = "live" #for full timing as in exploratorium visitor mode
-#timing = "debug" #for quick debug timing
+# timing = "live" #for full timing as in exploratorium visitor mode
+timing = "debug" #for quick debug timing
 
 if eeg_source == "real":
     serverName = "server.neuron.brain"
@@ -397,6 +397,7 @@ if __name__ == "__main__":
     print 'ChangeYourBrain state engine started, beginning protocol.'
     sb_client.set_handle_value('alpha_absolute',sc.process_eeg_alpha)
 
+    print 'waiting for tag in'
     if (eeg_source == 'real'):
         #time.sleep(4)
         #sc.tag_in()
@@ -404,6 +405,6 @@ if __name__ == "__main__":
     else:
         time.sleep(4)
         sc.tag_in()
-
-    print 'attempting to tag in'
+        time.sleep(12)
+        sc.tag_in() #TEST
 

@@ -19,7 +19,7 @@ class ChangeYourBrainStateControl( object ):
         self.client_name = client_name
         self.sb_server = sb_server
         self.ecg = ecg
-        self.experiment_state = NO_EXPERIMENT
+        self.set_state(NO_EXPERIMENT)
         self.condition_state = NO_CONDITION
         self.tag_time = 0 #last time someone tagged in
         self.vis_period = vis_period_sec
@@ -55,6 +55,8 @@ class ChangeYourBrainStateControl( object ):
 
     def tag_in(self,muse_id='0000'):
         #devNote: put here possible confirmation of user change if in middle of experiment
+        self.tag_time = time.time()
+        print 'tagged in at',self.tag_time
         self.alpha_save_condition = {'time': [], 'value':[], 'all': []}
         self.hrv_save_condition = {'time': [], 'value': [], 'device_time': []}
 
@@ -64,25 +66,31 @@ class ChangeYourBrainStateControl( object ):
         self.meta_data = {'time': [time.time(),], 'value':['TAG_IN',]} #program state etc
 
         self.start_setup_instructions()
-        self.tag_time = time.time()
-        print 'tagged in'
 
     ######################################################
     ### STATE CHANGING ############
+    def set_state(self,state):
+        self.experiment_state = state
+        print time.time(),state
+
     def start_setup_instructions(self):
         #devNote: possibly add both time-in and time-out timer here which takes us back to (no experiment)
-        self.experiment_state = SETUP_INSTRUCTIONS        
+        self.set_state(SETUP_INSTRUCTIONS)        
         self.output_instruction()
         self.do_every_while(self.vis_period,SETUP_INSTRUCTIONS,self.start_on_lead) #start as soon as we see ECG lead on
 
     def start_baseline_instructions(self):
-        self.experiment_state = BASELINE_INSTRUCTIONS
+        if self.experiment_state not in [SETUP_INSTRUCTIONS,BASELINE_CONFIRMATION]:
+            return
+        self.set_state(BASELINE_INSTRUCTIONS)
         self.output_instruction()
         instruction_timer = Timer(self.baseline_instruction_seconds,self.start_baseline_collection) 
         instruction_timer.start()
         
     def start_baseline_collection(self):
-        self.experiment_state = BASELINE_COLLECTION
+        if self.experiment_state != BASELINE_INSTRUCTIONS:
+            return        
+        self.set_state(BASELINE_COLLECTION)
         self.meta_data['value'].append(('state','BASELINE_COLLECTION'))
         self.meta_data['time'].append(time.time())
 
@@ -93,29 +101,34 @@ class ChangeYourBrainStateControl( object ):
         self.sb_server.ws.send(json.dumps(instruction))
         print "start baseline collection" 
 
-        baseline_timer = Timer(self.baseline_seconds,self.start_post_baseline) #*** devNote: may want to send a countdown to visualization %%%
+        baseline_timer = Timer(self.baseline_seconds,self.start_post_baseline)
         baseline_timer.start()
         self.do_every_while(self.vis_period,BASELINE_COLLECTION,self.output_baseline) # instruct vis to start plotting 
 
     def start_post_baseline(self):
         """ask for confirmation + subjective feedback + selection of condition"""
-        self.experiment_state = BASELINE_CONFIRMATION
-        self.baseline_confirmation = 1 ###TEMP!
-        #self.baseline_confirmation = 0 #confirmed = 1, disconfirmed = -1
-        # self.output_instruction('CONFIRMATION')
-        # while not self.baseline_confirmation: #neither confirmed nor disconfirmed
-        #     self.check_ecg_lead() #should turn on ECG cconnection 
-        #     continue
-        # if self.baseline_confirmation < 0: 
-        #     self.start_baseline_instructions()
-        #     print 'returning from post_baseline after disconfirmation of correct collection'
-        #     return
+        if self.experiment_state != BASELINE_COLLECTION:
+            return
+        self.set_state(BASELINE_CONFIRMATION)
+        # self.baseline_confirmation = 1 ###TEMP!
+        self.baseline_confirmation = 0 #confirmed = 1, disconfirmed = -1
+        self.output_instruction('CONFIRMATION')
+        while not self.baseline_confirmation: #neither confirmed nor disconfirmed
+            self.check_ecg_lead() #should turn on ECG cconnection 
+            continue
+        if self.baseline_confirmation < 0: 
+            self.start_baseline_instructions()
+            print 'returning from post_baseline after disconfirmation of correct collection'
+            return
         ### collect subj info
         self.baseline_subj = []
         for question in ['Q1','Q2','Q3','Q4']:
             self.output_instruction(question)
             while not self.poll_answer:
+                if self.experiment_state != BASELINE_CONFIRMATION: #ensure we are in right state
+                    return
                 continue
+            print self.baseline_subj
             self.baseline_subj.append(self.poll_answer)
             self.poll_answer = False
 
@@ -123,14 +136,18 @@ class ChangeYourBrainStateControl( object ):
         self.start_condition_instructions()
 
     def start_condition_instructions(self):
+        if self.experiment_state not in [BASELINE_CONFIRMATION,CONDITION_CONFIRMATION]:
+            return
         ### differentiate between the three possible conditions (currently assuming breathing)
-        self.experiment_state = CONDITION_INSTRUCTIONS
+        self.set_state(CONDITION_INSTRUCTIONS)
         self.output_instruction()
-        instruction_timer = Timer(self.condition_instruction_seconds,self.start_condition_collection) #*** devNote: may want to send a countdown to visualization
+        instruction_timer = Timer(self.condition_instruction_seconds,self.start_condition_collection) 
         instruction_timer.start()
 
     def start_condition_collection(self):
-        self.experiment_state = CONDITION_COLLECTION
+        if self.experiment_state != CONDITION_INSTRUCTIONS: 
+            return
+        self.set_state(CONDITION_COLLECTION)
         self.meta_data['value'].append(('state',CONDITION_COLLECTION))
         self.meta_data['time'].append(time.time())
 
@@ -157,29 +174,33 @@ class ChangeYourBrainStateControl( object ):
         print 'baseline_alpha',self.baseline_alpha
         print 'baseline_hrv', self.baseline_hrv
 
-        condition_timer = Timer(self.condition_seconds,self.start_post_condition) #*** devNote: may want to send a countdown to visualization %%%
+        condition_timer = Timer(self.condition_seconds,self.start_post_condition) 
         condition_timer.start()
         ### ??? send instructor
         self.do_every_while(self.vis_period,CONDITION_COLLECTION,self.output_condition) # instruct vis to start plotting 
 
     def start_post_condition(self):
         """ask for confirmation + subjective feedback"""
-        self.experiment_state = CONDITION_CONFIRMATION
-        self.condition_confirmation = 1 #TEMP
-        # self.condition_confirmation = 0 #confirmed = 1, disconfirmed = -1
-        # self.output_instruction('CONFIRMATION')
-        # while not self.condition_confirmation: #neither confirmed nor disconfirmed
-        #     self.check_ecg_lead() #should turn on ECG cconnection 
-        #     continue
-        # if self.condition_confirmation < 0: 
-        #     self.start_condition_instructions()
-        #     print 'returning from post_condition'
-        #     return
+        if self.experiment_state != CONDITION_COLLECTION: 
+            return
+        self.set_state(CONDITION_CONFIRMATION)
+        # self.condition_confirmation = 1 #TEMP
+        self.condition_confirmation = 0 #confirmed = 1, disconfirmed = -1
+        self.output_instruction('CONFIRMATION')
+        while not self.condition_confirmation: #neither confirmed nor disconfirmed
+            self.check_ecg_lead() #should turn on ECG cconnection 
+            continue
+        if self.condition_confirmation < 0: 
+            self.start_condition_instructions()
+            print 'returning from post_condition'
+            return
         self.condition_subj = []
-        ### collect subj info
+        #collect subj info
         for question in ['Q1','Q2','Q3','Q4']:
             self.output_instruction(question)
             while not self.poll_answer:
+                if self.experiment_state != CONDITION_CONFIRMATION: #ensure we are in right state
+                    return
                 continue
             self.condition_subj.append(self.poll_answer)
             self.poll_answer = False
@@ -189,7 +210,9 @@ class ChangeYourBrainStateControl( object ):
 
     def start_post_experiment(self):
         """display aggregates and wait for new tag in!"""
-        self.experiment_state = POST_EXPERIMENT
+        if self.experiment_state != CONDITION_CONFIRMATION: 
+            return
+        self.set_state(POST_EXPERIMENT)
         self.output_post_experiment()
 
     ######################################################
@@ -487,6 +510,7 @@ class FakeKeyboardInput ( threading.Thread ):
                 self.state_control.win_keyboard_input(96)
             else:
                 self.state_control.win_keyboard_input(97)
+            time.sleep(1)
             for k in xrange(98,100): 
                 self.state_control.win_keyboard_input(k)
                 time.sleep(1)
