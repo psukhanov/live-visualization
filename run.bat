@@ -10,5 +10,5 @@ REM taskkill /F /IM chrome.exe
 start "" "C:\Program Files (x86)\Windows Media Player\wmplayer.exe" "C:\Users\ExplorCogTech\Music\stream.wav"
 start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --kiosk
 timeout /t 1 /nobreak
-cd ../cloudbrain-master/listeners/
-start python biodata_spacebrew_client.py 
+cd ..
+start python ./cloudbrain-master/listeners/biodata_spacebrew_client.py 

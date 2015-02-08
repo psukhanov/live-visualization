@@ -125,7 +125,7 @@ class ChangeYourBrainStateControl( object ):
         for question in ['Q1','Q2','Q3','Q4']:
             self.output_instruction(question)
             while not self.poll_answer:
-            self.check_ecg_lead() #should turn on ECG cconnection 
+                self.check_ecg_lead() #should turn on ECG cconnection 
                 if self.experiment_state != BASELINE_CONFIRMATION: #ensure we are in right state
                     return
                 continue
