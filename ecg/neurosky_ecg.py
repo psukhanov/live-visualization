@@ -225,9 +225,6 @@ class NeuroskyECG(object):
 
             lead_status  = next(( d for d in output if 'leadoff' in d), None)
             if lead_status is not None:
-                #print lead_status
-                #if cur_leadstatus != lead_status['leadoff']:
-                #    print " LEAD CHANGE ================================="
                 if cur_leadstatus != lead_status['leadoff']:
                     #we have a change
                     if lead_status['leadoff']==200:
@@ -261,9 +258,10 @@ class NeuroskyECG(object):
         """ initialize the TgEcg algorithm dll """
 
         if sys.maxsize > (2**32)/2-1: #running 64 bit
+            print "loading Neurosky tg_ecg library, 64 bit"
             libname = 'TgEcgAlg64.dll'
         else:
-            print "loading 32 bit"
+            print "loading Neurosky tg_ecg library, 32 bit"
             #libname = 'TgEcgAlg.dll'
             libname = 'tg_ecg.so'
         print "loading analysis library: ", libname
@@ -282,6 +280,8 @@ class NeuroskyECG(object):
         """ reset ecg algorithm """
         print "resetting ecg analysis library"
         self.analyze.tg_ecg_init()
+        self.starttime = None
+        self.curtime = None
 
     def getTotalNumRRI(self):
         """
@@ -290,7 +290,7 @@ class NeuroskyECG(object):
         return self.analyze.tg_ecg_get_total_rri_count()
 
 
-    def ecgalgAnalyzeRaw(self, D): #, dataqueue):
+    def ecgalgAnalyzeRaw(self, D, nHRV=30): #, dataqueue):
         """
         test to see if we have values in the ecg_buffer, and if so, pass
         the most recent raw_ecg value into the TgEcg analysis framework
@@ -302,7 +302,7 @@ class NeuroskyECG(object):
         self.analyze.tg_ecg_update(D['ecg_raw'])
         #ecg_filt = self.analyze.tg_ecg_get_raw_filtered() #delayed against raw by 211 samples
         ecg_filt = self.analyze.tg_ecg_get_raw_smoothed() #delayed against raw by 450 samples, if 60Hz powerline
-        D['ecg_filt']= ecg_filt
+        D['ecg_filt'] = ecg_filt
 
         if self.analyze.tg_ecg_is_r_peak():
             #print "found peak"
@@ -312,9 +312,14 @@ class NeuroskyECG(object):
             D['rri']= rri
             D['hr'] = hr
             print "%i HR: %i (rri: %i)" % (num_rri, 60000* 1/rri, rri)
-            if num_rri >= 30 and (num_rri+2) % self.HRV_UPDATE == 0: 
-                #calculate every 4 heartbeats, starting at 30
-                hrv = self.analyze.tg_ecg_compute_hrv(30)
+
+            if num_rri>=15 and num_rri < nHRV:
+                # slowly increase number of RRIs in HRV calculation until we reach nHRV
+                # This is equivalen to starting with a window of 15 RRIs and increasing the window length to max=nHRV
+                nHRV = num_rri
+            if num_rri >= nHRV and (num_rri+2) % self.HRV_UPDATE == 0: 
+                #calculate every HRV_UPDATE heartbeats, starting at nHRV (window increases from 15 to 30)
+                hrv = self.analyze.tg_ecg_compute_hrv(nHRV)
                 D['hrv'] = hrv
                 print "hrv: " + str(hrv)
 
@@ -323,9 +328,11 @@ class NeuroskyECG(object):
 
 
 if __name__ == "__main__":
-    ### all of the code below is used for visualization and testing of the ECG framework
-    ### not to be used as production code, but can be used for examples on how to use
-    ### the NSK framework
+    """
+     all of the code below is used for visualization and testing of the ECG framework
+     not to be used as production code, but can be used for examples on how to use
+     the NSK framework
+    """
     import numpy as np
     #from matplotlib import pyplot as plt
     import pylab as plt
