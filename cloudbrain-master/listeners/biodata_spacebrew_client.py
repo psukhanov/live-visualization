@@ -235,6 +235,8 @@ class ecg_real(object):
         #optional call, default is already 1
         self.nskECG.setHRVUpdate(1) #update hrv every 1 detected pulses
 
+        # want the LEAD_TIMEOUT to hold on to values between baseline and test, but reset between users
+        self.LEAD_TIMEOUT = 30 # reset algorithm if leadoff for more than this many seconds
         self.cur_lead_on = False
         self.cur_hrv = 0
 
@@ -263,10 +265,10 @@ class ecg_real(object):
                 else:
                     self.cur_lead_on = False # no connection between leads
 
-                # if we are more than 2 seconds in and leadoff is still zero
+                # if we are more than LEAD_TIMEOUT seconds in and leadoff is still zero
                 if D['leadoff']==0:
                     leadoff_count+=1
-                    if leadoff_count> self.nskECG.Fs*15:
+                    if leadoff_count> self.nskECG.Fs*self.LEAD_TIMEOUT:
                         if self.nskECG.getTotalNumRRI()!=0:
                             #reset the library
                             self.nskECG.ecgResetAlgLib()
