@@ -117,7 +117,7 @@ circle {
 }
 
 .widget #instructions {
-  font-size: 44px;
+  font-size: 40px;
   line-height: 2.0;
 }
 
@@ -152,6 +152,10 @@ circle {
 
 .box .description {
   font-size: 22px;
+}
+
+#result-description {
+  font-size: 20px;
 }
 
 .logo h2 >a {

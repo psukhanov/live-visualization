@@ -265,7 +265,7 @@ function drawRadar(data){
       {axis: "calm", value: data[0]},
       {axis: "contentedness", value: data[1]},
       {axis: "distraction", value: data[2]},
-      {axis: "well-being", value: data[3]},
+      {axis: "happiness", value: data[3]},
     ]
   },
   {
@@ -274,7 +274,7 @@ function drawRadar(data){
       {axis: "calm", value: data[4]},
       {axis: "contentedness", value: data[5]},
       {axis: "distraction", value: data[6]},
-      {axis: "well-being", value: data[7]},
+      {axis: "happiness", value: data[7]},
     ]
   }
 ];
