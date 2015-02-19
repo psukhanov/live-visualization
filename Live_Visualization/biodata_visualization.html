@@ -28,11 +28,15 @@
                     </div>
                     <ul class="nav navbar-nav navbar-right pull-right">
                         <li class="connection">
-                            <i class="fa fa-circle text-success"></i>
+                            <div class="eeg-indicator">
+                                <i class="fa fa-circle text-success"></i>
+                            </div>
                             <span class="label-name" id="eeg_state">EEG: Connected</span>
                         </li>
                         <li class="connection">
-                            <i class="fa fa-circle text-success"></i>
+                            <div class="ecg-indicator">
+                                <i class="fa fa-circle text-success"></i>
+                            </div>
                             <span class="label-name" id="ecg_state">ECG: Not Connected</span>
                         </li>
                     </ul>
@@ -212,6 +216,8 @@
             // initialize program variables
             var eeg_state = "DISCONNECTED";
             var ecg_state = "DISCONNECTED";
+            var indicator_connected = '<i class="fa fa-circle text-success"></i>';
+            var indicator_disconnected = '<i class="fa fa-circle text-danger"></i>';
             var eeg_buffer = [];
             var ecg_buffer = [];
             var baseline_eeg_buffer = [];
@@ -361,6 +367,8 @@ function onOpen() {
     console.log("spacebrew client connection opened")
     $("#eeg_state").html( eeg_connected_text );
     $("#ecg_state").html( ecg_disconnected_text );
+    $('.eeg-indicator').html(indicator_connected);
+    $('.eeg-indicator').html(indicator_disconnected);
 }
 
 function onClose() {
@@ -368,6 +376,8 @@ function onClose() {
     $("#eeg_state").html( eeg_disconnected_text );
     $("#ecg_state").html( ecg_disconnected_text );
     //$("#message").html( message );
+    $('.eeg-indicator').html(indicator_disconnected);
+    $('.eeg-indicator').html(indicator_disconnected);
 }
 /**
 * onStringMessage Function that is called whenever new spacebrew string messages are received.
@@ -514,10 +524,12 @@ function update_ui(instruction)
     {
 	   if (instruction.type == "eeg"){
 		  $("#eeg_state").html( eeg_connected_text );
+          $('.eeg-indicator').html(indicator_connected);
 	   }
 	else if (instruction.type == "ecg")
 	{
 		$("#ecg_state").html( ecg_connected_text );
+        $('.ecg-indicator').html(indicator_connected);
 	}
 }
 
@@ -525,10 +537,12 @@ else if (instruction.instruction_name == "DISCONNECTED")
 {
 	if (instruction.type == "eeg"){
 		$("#eeg_state").html( eeg_disconnected_text );
+        $('.eeg-indicator').html(indicator_disconnected);
 	}
 	else if (instruction.type == "ecg")
 	{
 		$("#ecg_state").html( ecg_disconnected_text );
+        $('.ecg-indicator').html(indicator_disconnected);
 	}
 
 }
