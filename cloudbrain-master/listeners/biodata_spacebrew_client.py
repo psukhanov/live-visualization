@@ -19,14 +19,14 @@ from neurosky_ecg import NeuroskyECG
 import sys
 import serial
 
-# eeg_source = "real" #fake or real
-eeg_source = "fake" #fake or real
+eeg_source = "real" #fake or real
+# eeg_source = "fake" #fake or real
 
-# ecg_source = "real" #fake or real
-ecg_source = "fake" #fake or real
+ecg_source = "real" #fake or real
+# ecg_source = "fake" #fake or real
 
-# timing = "live" #for full timing as in exploratorium visitor mode
-timing = "debug" #for quick debug timing
+timing = "live" #for full timing as in exploratorium visitor mode
+# timing = "debug" #for quick debug timing
 
 if eeg_source == "real":
     serverName = "server.neuron.brain"

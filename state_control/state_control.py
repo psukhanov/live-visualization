@@ -333,8 +333,8 @@ class ChangeYourBrainStateControl( object ):
             'metadata': self.meta_data,
             'hrv baseline': self.hrv_save_baseline,
             'hrv condition': self.hrv_save_condition,
-            'hrv baseline': self.hrv_save_baseline,
-            'hrv condition': self.hrv_save_condition,
+            'alpha baseline': self.alpha_save_baseline,
+            'alpha condition': self.alpha_save_condition,
         }
         pickle.dump( output_dict, open( filename, "wb" ) )
 
