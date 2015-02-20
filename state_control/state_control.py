@@ -58,10 +58,10 @@ class ChangeYourBrainStateControl( object ):
         self.tag_time = time.time()
         print 'tagged in at',self.tag_time
         self.alpha_save_condition = {'time': [], 'value':[], 'all': []}
-        self.hrv_save_condition = {'time': [], 'value': [], 'device_time': []}
+        self.hrv_save_condition = {'time': [], 'value': [], 'rri': [], 'device_time': []}
 
         self.alpha_save_baseline = {'time': [], 'value':[], 'all': []}
-        self.hrv_save_baseline = {'time': [], 'value':[], 'device_time': []}
+        self.hrv_save_baseline = {'time': [], 'value':[], 'rri': [], 'device_time': []}
 
         self.meta_data = {'time': [time.time(),], 'value':['TAG_IN',]} #program state etc
 
@@ -270,6 +270,7 @@ class ChangeYourBrainStateControl( object ):
         self.hrv_save_baseline['time'].append(time.time())
         self.hrv_save_baseline['value'].append(self.ecg.get_hrv())
         self.hrv_save_baseline['device_time'].append(self.ecg.get_hrv_t())
+        self.hrv_save_baseline['rri'].append(self.ecg.get_rri())
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here
              "value": value_out,
@@ -292,6 +293,7 @@ class ChangeYourBrainStateControl( object ):
         self.hrv_save_condition['time'].append(time.time())
         self.hrv_save_condition['value'].append(self.ecg.get_hrv())
         self.hrv_save_condition['device_time'].append(self.ecg.get_hrv_t())
+        self.hrv_save_condition['rri'].append(self.ecg.get_rri())
 
         value_out = "{:.1f},{:.2f},{:.2f}".format(time.time()-self.tag_time,alpha_out,self.ecg.get_hrv())
         message = {"message": { #send synced EEG & ECG data here

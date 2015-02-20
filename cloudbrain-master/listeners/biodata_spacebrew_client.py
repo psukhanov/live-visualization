@@ -252,6 +252,7 @@ class ecg_real(object):
 
         self.cur_hrv = None #whatever the current hrv value is
         self.cur_hrv_t = None #timestamp with the current hrv
+        self.cur_rri = None #R to R interval as an int representing # samples
 
         sample_count = 0 #keep track of numbers of samples we've processed
         leadoff_count = 0 #counter for length of time been leadoff
@@ -284,6 +285,9 @@ class ecg_real(object):
                     self.cur_hrv = D['hrv']
                     self.cur_hrv_t = D['timestamp']
 
+                if 'rri' in D:
+                    self.cur_rri = D['rri']
+
             # we keep looping until something tells us to stop
         pass #
 
@@ -301,6 +305,13 @@ class ecg_real(object):
             return self.cur_hrv_t
         else:
             return -1
+
+    def get_rri(self):
+        if self.cur_rri:
+            return self.cur_rri
+        else:
+            return -1
+
 
 class ServerThread ( threading.Thread ):
 
